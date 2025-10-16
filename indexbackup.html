@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoInPhIm | Trang Nhúng</title>
+  <link rel="icon" type="image/png" href="img/image2-fotor-20250813113121.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            dark: {
+              900: '#0a0a0a',
+              800: '#121212',
+              700: '#1a1a1a',
+              600: '#222222',
+              500: '#2a2a2a',
+            },
+            netflix: { red: '#e50914' },
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #e5e5e5;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .embed-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .embed-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .embed-iframe.loading {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    /* ===== Liquid Glass Bottom Navigation - Transparent Glass Effect ===== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      width: 90%;
+      max-width: 500px;
+      height: 64px;
+      background: rgba(255, 255, 255, 0.03); /* Giảm opacity để trong suốt hơn */
+      backdrop-filter: none; /* Loại bỏ blur để thấy rõ nội dung phía sau */
+      -webkit-backdrop-filter: none; /* Loại bỏ blur trên WebKit */
+      border: 1px solid rgba(255, 255, 255, 0.08); /* Viền mỏng hơn */
+      border-radius: 32px; /* Giữ bo tròn mạnh */
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 4.2), inset 0 1px 0 rgba(255, 255, 255, 0.5); /* Hiệu ứng kính trong */
+      z-index: 1000;
+      overflow: hidden;
+      will-change: transform, opacity;
+    }
+
+    .bottom-nav::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.1), transparent 60%); /* Gradient nhẹ để giữ trong suốt */
+      opacity: 0.3;
+      animation: liquidMove 10s ease-in-out infinite alternate;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+    }
+
+    @keyframes liquidMove {
+      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+      100% { transform: translate(-15%, -15%) rotate(5deg) scale(1.15); }
+    }
+
+    /* ===== Buttons with Lens Effect ===== */
+    .bottom-nav-btn {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.75);
+      background: none;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-size: 0.75rem;
+      min-width: 60px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .bottom-nav-btn::after {
+      content: "";
+      position: absolute;
+      top: -20%;
+      left: -20%;
+      width: 140%;
+      height: 140%;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.06), transparent 70%);
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .bottom-nav-btn:hover::after,
+    .bottom-nav-btn.active::after {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .bottom-nav-btn::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      filter: blur(6px);
+      pointer-events: none;
+    }
+
+    .bottom-nav-btn.clicked::before {
+      animation: waterRipple 0.7s ease-out forwards;
+    }
+
+    @keyframes waterRipple {
+      0% { transform: translate(-50%, -50%) scale(0.1); opacity: 0.7; }
+      50% { transform: translate(-50%, -50%) scale(2.5); opacity: 0.3; }
+      100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+    }
+
+    .bottom-nav-btn.active {
+      color: #ff0000;
+      text-shadow: 0 0 6px rgba(255, 0, 0, 0.35);
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    .bottom-nav-btn:hover {
+      color: #ff0000;
+      transform: translateY(-3px) scale(1.03);
+    }
+
+    .nav-icon {
+      width: 26px;
+      height: 26px;
+      fill: currentColor;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s ease;
+      border-radius: 50%;
+      padding: 4px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .bottom-nav-btn.active .nav-icon {
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.45)) brightness(1.1);
+    }
+
+    .bottom-nav-btn.clicked .nav-icon {
+      animation: liquidBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes liquidBounce {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.3); }
+      60% { transform: scale(0.95); }
+      100% { transform: scale(1.1); }
+    }
+
+    /* ===== Liquid Glass Morphing Effect ===== */
+    .liquid-morph {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 32px;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .liquid-morph.active {
+      opacity: 1;
+      animation: liquidMorph 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes liquidMorph {
+      0% {
+        transform: scale(0.7) skew(0deg);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.2) skew(5deg);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(1) skew(0deg);
+        opacity: 0;
+      }
+    }
+
+    /* ===== Liquid Drop Effect ===== */
+    .liquid-drop {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 60%);
+      filter: blur(3px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .liquid-drop.active {
+      animation: liquidDrop 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes liquidDrop {
+      0% {
+        transform: translateY(0) scale(0.4) rotate(0deg);
+        opacity: 0.9;
+      }
+      50% {
+        transform: translateY(-20px) scale(1.3) rotate(10deg);
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(-40px) scale(1.6) rotate(20deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .bottom-nav {
+        width: 95%;
+        height: 60px;
+        border-radius: 28px;
+      }
+      .nav-icon {
+        width: 24px;
+        height: 24px;
+      }
+      .bottom-nav-btn {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-dark-900 text-gray-200">
+  <div class="embed-container">
+    <iframe id="embed-iframe" class="embed-iframe" src="TrangChu.html"></iframe>
+  </div>
+
+  <!-- Liquid Glass Bottom Navigation -->
+  <nav class="bottom-nav">
+    <div class="liquid-morph" id="liquid-morph"></div>
+    
+    <button class="bottom-nav-btn active" data-page="TrangChu.html">
+      <svg class="nav-icon" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H144 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8.6c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/>
+      </svg>
+      <span>Trang chủ</span>
+    </button>
+
+    <!-- ✨ Tìm kiếm: icon search -->
+    <button class="bottom-nav-btn" data-page="filter.html">
+      <svg class="nav-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
+      </svg>
+      <span>Tìm kiếm</span>
+    </button>
+
+    <button class="bottom-nav-btn" data-page="favorites.html">
+      <svg class="nav-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"/>
+      </svg>
+      <span>Yêu Thích</span>
+    </button>
+
+    <button class="bottom-nav-btn" data-page="watch.html">
+      <svg class="nav-icon" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z"/>
+      </svg>
+      <span>Xem</span>
+    </button>
+  </nav>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const iframe = document.getElementById("embed-iframe");
+      const navButtons = document.querySelectorAll(".bottom-nav-btn");
+      const liquidMorph = document.getElementById("liquid-morph");
+      
+      // Tạo các giọt nước động
+      function createLiquidDrops(button) {
+        const buttonRect = button.getBoundingClientRect();
+        const navRect = button.closest('.bottom-nav').getBoundingClientRect();
+        
+        for (let i = 0; i < 4; i++) {
+          const drop = document.createElement('div');
+          drop.className = 'liquid-drop';
+          
+          const leftOffset = (buttonRect.left - navRect.left) + (buttonRect.width / 2);
+          const randomOffsetX = (Math.random() - 0.5) * 25;
+          const randomSize = 15 + Math.random() * 10;
+          
+          drop.style.left = `${leftOffset + randomOffsetX}px`;
+          drop.style.top = `${buttonRect.height / 2}px`;
+          drop.style.width = `${randomSize}px`;
+          drop.style.height = `${randomSize}px`;
+          
+          button.appendChild(drop);
+          
+          setTimeout(() => {
+            drop.classList.add('active');
+            setTimeout(() => {
+              if (drop.parentNode) {
+                drop.parentNode.removeChild(drop);
+              }
+            }, 1000);
+          }, 60 * i);
+        }
+      }
+
+      function updateActiveButton() {
+        try {
+          const currentPage = iframe.contentWindow.location.pathname.split('/').pop() || "TrangChu.html";
+          navButtons.forEach(btn => {
+            if (btn.dataset.page === currentPage) {
+              navButtons.forEach(b => b.classList.remove("active"));
+              btn.classList.add("active");
+            }
+          });
+        } catch (e) {
+          console.error("Lỗi khi truy cập location của iframe:", e);
+        }
+      }
+
+      iframe.addEventListener("load", updateActiveButton);
+      updateActiveButton();
+
+      navButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          button.classList.add("clicked");
+          setTimeout(() => button.classList.remove("clicked"), 700);
+          
+          liquidMorph.classList.add("active");
+          setTimeout(() => liquidMorph.classList.remove("active"), 1000);
+          
+          createLiquidDrops(button);
+
+          navButtons.forEach(btn => btn.classList.remove("active"));
+          button.classList.add("active");
+
+          iframe.classList.add("loading");
+          setTimeout(() => {
+            iframe.src = button.dataset.page;
+            setTimeout(() => iframe.classList.remove("loading"), 400);
+          }, 500);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

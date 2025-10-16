@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ | CoInPhIm</title>
+    <link rel="icon" type="image/png" href="img/image2-fotor-20250813113121.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0a0a0a',
+                            800: '#121212',
+                            700: '#1a1a1a',
+                            600: '#222222',
+                            500: '#2a2a2a',
+                        },
+                        netflix: {
+                            red: '#e50914',
+                        }
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+            margin: 0;
+            overflow-x: hidden;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        /* Force mobile viewport on all devices */
+        @media (min-width: 641px) {
+            body {
+                max-width: 640px;
+                margin: 0 auto;
+                position: relative;
+            }
+            .container {
+                max-width: 640px !important;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+        }
+        /* Top Navigation */
+        .top-nav {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .top-nav .filter-btn {
+            transition: all 0.2s ease;
+            background: rgba(229, 9, 20, 0.2);
+            color: #fff;
+            border: 1px solid rgba(229, 9, 20, 0.5);
+            border-radius: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+        .top-nav .filter-btn:hover {
+            background: rgba(229, 9, 20, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+        }
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.5);
+        }
+        .bottom-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: #e5e5e5;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            min-width: 60px;
+            gap: 0.25rem;
+        }
+        .bottom-nav-btn:hover,
+        .bottom-nav-btn.active {
+            background: rgba(229, 9, 20, 0.2);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+        }
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+        .filter-btn, .view-all-btn {
+            transition: all 0.2s ease;
+            background-color: transparent !important;
+            color: #e5e5e5;
+            border: none !important;
+            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .filter-btn:hover, .view-all-btn:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            background: rgba(229, 9, 20, 0.2) !important;
+        }
+        .view-all-btn {
+            background-color: transparent;
+            color: #e5e5e5;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        /* Content padding for bottom nav */
+        .content-with-bottom-nav {
+            padding-bottom: 80px;
+        }
+        /* Featured Section */
+        .featured-section {
+            position: relative;
+            width: 100vw;
+            height: 80vh;
+            margin-left: calc(-50vw + 50%);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            z-index: 10;
+        }
+        .featured-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            filter: brightness(0.6) contrast(1.1);
+            transition: transform 0.7s ease-in-out;
+        }
+        .featured-section:hover .featured-image.active {
+            transform: scale(1.05);
+        }
+        .featured-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .featured-overlay .content-left {
+            flex: 1;
+            max-width: 60%;
+        }
+        .featured-overlay h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .featured-overlay p {
+            font-size: 0.875rem;
+            color: #e5e5e5;
+            margin-top: 0.5rem;
+            line-clamp: 3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        .featured-overlay .content-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .watch-btn {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.7rem 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+            text-align: center;
+            width: fit-content;
+            text-decoration: none;
+        }
+        .watch-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(229, 9, 20, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.3s ease;
+            text-decoration: none;
+        }
+        .play-btn::before {
+            content: '';
+            width: 24px;
+            height: 24px;
+            background: url('https://img.icons8.com/ios-filled/50/ffffff/play.png') no-repeat center;
+            background-size: contain;
+        }
+        .play-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        /* Other styles remain unchanged */
+        .category-section {
+            margin-bottom: 2rem;
+            position: relative;
+            margin-left: -2rem;
+            margin-right: -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        .category-section h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #fff;
+            display: inline-block;
+        }
+        .category-grid {
+            display: flex;
+            overflow-x: auto;
+            gap: 1.5rem;
+            padding-bottom: 1rem;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+        .category-grid::-webkit-scrollbar {
+            display: none;
+        }
+        .category-grid .video-card {
+            flex: 0 0 220px;
+            scroll-snap-align: start;
+            transition: all 0.3s ease-in-out;
+            background-color: #1a1a1a;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: calc(var(--index) * 0.1s);
+        }
+        .category-grid .video-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6);
+        }
+        .category-grid .video-card img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .category-grid .video-card:hover img {
+            transform: scale(1.1);
+        }
+        .category-grid .video-card .content {
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            height: 80px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .category-grid .video-card .content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 48px;
+            max-height: 48px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .category-grid .video-card .content p {
+            font-size: 0.75rem;
+            color: #e5e5e5;
+            margin-top: 0.25rem;
+            line-clamp: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 20px;
+        }
+        .book-slider {
+            display: flex;
+            overflow-x: auto;
+            gap: 1.5rem;
+            padding-bottom: 1rem;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #555 #222;
+            scroll-behavior: smooth;
+        }
+        .book-slider::-webkit-scrollbar {
+            height: 8px;
+        }
+        .book-slider::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+        .book .video-card {
+            position: relative;
+            transition: transform 0.3s ease;
+            width: 360px;
+            height: 200px;
+            display: flex;
+            flex-direction: row;
+            background: linear-gradient(to right, #1a1a1a 50%, rgba(26, 26, 26, 0.9) 75%, transparent 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        .book .video-card img {
+            width: 50%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0 8px 8px 0;
+            z-index: 1;
+        }
+        .book .video-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6);
+        }
+        .book .video-card:hover img {
+            transform: scale(1.1);
+        }
+        .book .video-card .content {
+            width: 50%;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            background: transparent;
+            z-index: 2;
+        }
+        .book .video-card .content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 48px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .book .video-card .content p {
+            font-size: 0.75rem;
+            color: #e5e5e5;
+            margin-top: 0.5rem;
+            line-clamp: 3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        .video-feature-section {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+        }
+        .video-feature-section iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            aspect-ratio: 16 / 9;
+        }
+        .video-feature-section.latiohac {
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.8), transparent 20%, transparent 80%, rgba(0, 0, 0, 0.8));
+        }
+        .video-feature-section.superman iframe {
+            filter: brightness(0.8) blur(2px);
+        }
+        .video-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+            z-index: 2;
+            flex-wrap: wrap;
+        }
+        .video-overlay h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            max-width: 50%;
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .video-overlay .watch-btn {
+            margin-left: auto;
+        }
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.3s ease;
+        }
+        .slider-nav:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        .slider-nav.prev {
+            left: 0.5rem;
+        }
+        .slider-nav.next {
+            right: 0.5rem;
+        }
+        .slider-nav svg {
+            width: 24px;
+            height: 24px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            background-color: #2a2a2a;
+            color: #e5e5e5;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .pagination-btn:hover {
+            background-color: #333;
+        }
+        .pagination-btn.active {
+            background-color: #e50914;
+            color: white;
+        }
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #video-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            min-height: 200px;
+            margin-left: -2rem;
+            margin-right: -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        #video-list .video-card {
+            transition: all 0.3s ease-in-out;
+            background-color: #1a1a1a;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: calc(var(--index) * 0.1s);
+        }
+        #video-list .video-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6);
+        }
+        #video-list .video-card img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        #video-list .video-card:hover img {
+            transform: scale(1.1);
+        }
+        #video-list .video-card .content {
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            height: 80px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        #video-list .video-card .content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 48px;
+            max-height: 48px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        #video-list .video-card .content p {
+            font-size: 0.75rem;
+            color: #e5e5e5;
+            margin-top: 0.25rem;
+            line-clamp: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 20px;
+        }
+        .scrolling-container {
+            overflow: hidden;
+            width: 100%;
+            margin-left: -2rem;
+            margin-right: -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        .scrolling-content {
+            display: flex;
+            animation: scroll 17s linear infinite;
+            white-space: nowrap;
+        }
+        .scrolling-card {
+            flex: 0 0 220px;
+            margin-right: 1.5rem;
+            background-color: #1a1a1a;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        .scrolling-card img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+        }
+        .scrolling-card h3 {
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            text-align: center;
+            color: #fff;
+        }
+        .footer {
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+            width: 100%;
+            padding: 1.5rem 1rem;
+            margin-top: 2rem;
+            border-top: 1px solid #333;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .footer-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .footer a {
+            color: #e50914;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .footer a:hover {
+            color: #c10812;
+        }
+        .footer p {
+            font-size: 0.875rem;
+            margin: 0;
+        }
+        .footer .links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .footer .disclaimer {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        @media (max-width: 640px) {
+            .footer {
+                padding: 1rem 0.5rem;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .footer p {
+                font-size: 0.75rem;
+            }
+            .footer .disclaimer {
+                font-size: 0.65rem;
+            }
+            .footer .links {
+                flex-direction: column;
+                align-items: center;
+            }
+            .featured-section {
+                height: 45vh;
+            }
+            .featured-overlay {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .featured-overlay .content-left {
+                max-width: 100%;
+                margin-bottom: 1rem;
+            }
+            .featured-overlay h2 {
+                font-size: 1.25rem;
+                max-width: 100%;
+            }
+            .featured-overlay p {
+                font-size: 0.75rem;
+                max-width: 100%;
+                -webkit-line-clamp: 2;
+            }
+            .featured-overlay .content-right {
+                flex-direction: row;
+                gap: 0.5rem;
+            }
+            .watch-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+            .play-btn {
+                width: 40px;
+                height: 40px;
+            }
+            .play-btn::before {
+                width: 16px;
+                height: 16px;
+            }
+            .book .video-card {
+                width: 280px;
+                height: 180px;
+                flex: 0 0 100%;
+            }
+            .book .video-card img {
+                width: 50%;
+                height: 100%;
+            }
+            .book .video-card .content {
+                width: 50%;
+                height: 100%;
+                padding: 1rem 0.75rem;
+            }
+            .book .video-card .content h3 {
+                font-size: 0.9rem;
+            }
+            .book .video-card .content p {
+                font-size: 0.7rem;
+                line-clamp: 2;
+                max-height: 36px;
+            }
+            .book-slider {
+                display: flex;
+                justify-content: flex-start;
+            }
+            .category-section {
+                margin-left: -1rem;
+                margin-right: -1rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .category-grid .video-card {
+                flex: 0 0 160px;
+            }
+            .category-grid .video-card img {
+                height: 240px;
+            }
+            .scrolling-container {
+                margin-left: -1rem;
+                margin-right: -1rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .scrolling-card {
+                flex: 0 0 160px;
+            }
+            .scrolling-card img {
+                height: 240px;
+            }
+            #video-list {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                margin-left: -1rem;
+                margin-right: -1rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .video-feature-section {
+                height: 40vh;
+            }
+            .video-overlay h2 {
+                font-size: 1.25rem;
+                max-width: 100%;
+            }
+            .custom-featured-overlay {
+                align-items: center;
+            }
+        }
+        .custom-featured-section {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            margin-bottom: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(229, 9, 20, 0.3);
+        }
+        .custom-featured-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            filter: brightness(0.8);
+            transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+        }
+        .custom-featured-section:hover .custom-featured-image.active {
+            transform: scale(1.08);
+            opacity: 0.95;
+        }
+        .custom-featured-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+        .custom-featured-section:hover .custom-featured-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .custom-featured-overlay h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 0.5rem;
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .custom-featured-overlay p {
+            font-size: 0.875rem;
+            color: #e5e5e5;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
+            line-clamp: 3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (min-width: 641px) {
+            .book .video-card {
+                flex: 0 0 calc(33.333% - 1rem);
+            }
+        }
+        @media (min-width: 641px) and (max-width: 1024px) {
+            #video-list {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            .category-grid .video-card {
+                flex: 0 0 200px;
+            }
+            .video-feature-section {
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans bg-dark-900 text-gray-200">
+    <div class="main-content active">
+        <div class="container mx-auto px-4 py-4 content-with-bottom-nav">
+            <div class="relative">
+                <div id="featured-section" class="featured-section mt-2">
+                    <div id="carousel" class="relative w-full h-full">
+                        <div id="carousel-images" class="relative w-full h-full overflow-hidden"></div>
+                        <div class="featured-overlay">
+                            <div class="content-left">
+                                <h2 id="featured-title" class="text-2xl font-bold text-white mb-2"></h2>
+                                <p id="featured-episodes" class="text-gray-300 mb-2"></p>
+                                <p id="featured-description" class="text-gray-300 mb-4 text-sm line-clamp-3"></p>
+                            </div>
+                            <div class="content-right">
+                                <a id="featured-watch-btn" href="" class="watch-btn">Xem ngay</a>
+                                <a id="featured-play-btn" href="" class="play-btn"></a>
+                            </div>
+                        </div>
+                        <button id="prev-slide" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-dark-600 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition z-20">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button id="next-slide" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-dark-600 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition z-20">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="scrolling-section" class="mt-8 mb-8">
+                <h2 class="text-xl font-bold text-white mb-4">Phim Về Phù Thủy Nè, Coi Đi Mấy Ní</h2>
+                <div class="scrolling-container">
+                    <div id="scrolling-content" class="scrolling-content"></div>
+                </div>
+            </div>
+            <div id="recommended-video-section" class="video-feature-section latiohac">
+                <div class="relative w-full h-full">
+                    <iframe src="https://dp3011105.github.io/DataVideo/index2"
+                            frameborder="0"
+                            allow="autoplay; fullscreen"
+                            allowfullscreen>
+                    </iframe>
+                    <div class="video-overlay">
+                        <h2 id="recommended-video-title">La Tiểu Hắc Chiến Ký - Sắp có phần 2 rồi xem phần 1 lấy cảm xúc nào</h2>
+                        <a href="https://moloz.blogtool.net/playlist/6533595002ea13250ded197a/master.m3u8"
+                        class="watch-btn" data-title="La Tiểu Hắc Chiến Ký">Xem ngay</a>
+                    </div>
+                </div>
+            </div>
+            <div id="korean-movies-section" class="category-section">
+                <h2 class="text-xl font-bold text-white mb-4">Phim Hàn Quốc nè Annyeong haseyo (안녕하세요)!</h2>
+                <div class="relative">
+                    <button class="slider-nav prev" onclick="scrollSlider('korean-movies-grid', -360)">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="korean-movies-grid" class="book-slider book"></div>
+                    <button class="slider-nav next" onclick="scrollSlider('korean-movies-grid', 360)">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="recommended-video-section" class="video-feature-section latiohac">
+                <div class="relative w-full h-full">
+                    <iframe src="https://dp3011105.github.io/DataVideo/"
+                            frameborder="0"
+                            allow="autoplay; fullscreen"
+                            allowfullscreen>
+                    </iframe>
+                    <div class="video-overlay">
+                        <h2 id="recommended-video-title">Superman - Phim Đỉnh Lắm Luôn Bấm Xem Ngay Đi</h2>
+                        <a href="https://s6.kkphimplayer6.com/20250718/SGRrkMdW/index.m3u8"
+                        class="watch-btn" data-title="La Tiểu Hắc Chiến Ký">Xem ngay</a>
+                    </div>
+                </div>
+            </div>
+            <div id="recommended-movies-section" class="category-section">
+                <h2 class="text-xl font-bold text-white mb-4">Anime tui mò được</h2>
+                <div class="relative">
+                    <button class="slider-nav prev" onclick="scrollSlider('recommended-movies-grid', -360)">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="recommended-movies-grid" class="book-slider book"></div>
+                    <button class="slider-nav next" onclick="scrollSlider('recommended-movies-grid', 360)">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="custom-featured-section" class="custom-featured-section">
+                <h2 class="text-xl font-bold text-white mb-4">Phim hoạt hình siêu đỉnh cao luôn</h2>
+                <div id="custom-carousel" class="relative w-full h-full">
+                    <div id="custom-carousel-images" class="relative w-full h-full overflow-hidden"></div>
+                    <div class="custom-featured-overlay">
+                        <h2 id="custom-featured-title" class="text-2xl font-bold text-white mb-2"></h2>
+                        <p id="custom-featured-description" class="text-gray-300 mb-4"></p>
+                        <a id="custom-featured-watch-btn" href="" class="watch-btn">Xem ngay</a>
+                    </div>
+                    <button id="custom-prev-slide" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-dark-600 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition z-20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button id="custom-next-slide" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-dark-600 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition z-20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="video-list-section" class="w-full">
+                <div id="category-sections"></div>
+                <div id="video-list"></div>
+                <div id="pagination" class="pagination"></div>
+            </div>
+            <footer class="footer bg-dark-900 text-gray-200 w-full py-6 px-4 mb-20">
+                <div class="footer-content max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="footer-section text-center md:text-left">
+                        <h3 class="text-lg font-bold text-white mb-2">CoInPhIm</h3>
+                        <p class="text-sm">Trang web xem phim miễn phí, phi lợi nhuận dành cho bạn bè và người thân. Không quảng cáo, nguồn video nhúng từ các trang hợp pháp.</p>
+                    </div>
+                    <div class="footer-section text-center md:text-left">
+                        <h4 class="text-md font-semibold text-white mb-2">Liên kết nhanh</h4>
+                        <div class="links flex flex-col md:flex-row gap-4">
+                            <a href="index.html" class="text-netflix-red hover:text-red-700">Trang chủ</a>
+                            <a href="filter.html" class="text-netflix-red hover:text-red-700">Bộ lọc phim</a>
+                            <a href="https://discord.gg/uqNA78fs9G" target="_blank" class="text-netflix-red hover:text-red-700">Discord</a>
+                        </div>
+                    </div>
+                    <div class="footer-section text-center md:text-left">
+                        <h4 class="text-md font-semibold text-white mb-2">Liên hệ</h4>
+                        <p class="text-sm">Email: <a href="mailto:support@coinphim.com" class="text-netflix-red hover:text-red-700">support@coinphim.com</a></p>
+                        <p class="text-sm">Phản hồi lỗi: <a href="mailto:feedback@coinphim.com" class="text-netflix-red hover:text-red-700">feedback@coinphim.com</a></p>
+                    </div>
+                    <div class="footer-section text-center md:text-left">
+                        <h4 class="text-md font-semibold text-white mb-2">Thông tin</h4>
+                        <p class="text-sm">Phiên bản: 1.0 | Cập nhật: 28/09/2025</p>
+                        <p class="disclaimer text-xs text-gray-500 mt-2">Trang web không lưu trữ video, chỉ nhúng từ nguồn bên thứ ba. Liên hệ để gỡ bỏ nếu có vấn đề bản quyền.</p>
+                    </div>
+                </div>
+                <p class="text-sm text-center mt-6">&copy; 2025 CoInPhIm</p>
+            </footer>
+        </div>
+    </div>
+    <script>
+        let videos = [];
+        let scrollingMovies = [];
+        let koreanMovies = [];
+        let recommendedMovies = [];
+        let upcomingMovies = [];
+        let customFeaturedMovies = [];
+        const videosPerPage = 20;
+        let currentPage = 1;
+        function getVideoTitle(video) {
+            return video.TieuDe && video.TieuDe.trim() !== ''
+                ? video.TieuDe
+                : extractTitleFromUrl(video.tap?.[0]?.video) || 'Video không có tiêu đề';
+        }
+        function extractTitleFromUrl(url) {
+            if (!url) return null;
+            try {
+                const decodedUrl = decodeURIComponent(url);
+                const match = decodedUrl.match(/\/video\.[^/]+\/(.+)$/);
+                if (match && match[1] && match[1] !== '_') {
+                    return match[1]
+                        .replace(/_/g, ' ')
+                        .replace(/\b\w/g, c => c.toUpperCase())
+                        .replace(/%20/g, ' ');
+                }
+                return null;
+            } catch (e) {
+                console.error('Lỗi phân tích tiêu đề video:', e);
+                return null;
+            }
+        }
+        function createVideoCard(vid, index, isBookSlider = false) {
+            const videoCard = document.createElement("div");
+            videoCard.className = "video-card";
+            videoCard.style.setProperty('--index', index);
+            const title = getVideoTitle(vid);
+            const thumbnail = vid.anh || 'img/placeholder.jpg';
+            const categories = Array.isArray(vid.boloc) ? vid.boloc.join(", ") : 'Không có thể loại';
+            const videoId = vid.tap?.[0]?.video || '';
+            const description = vid.moTa || 'Không có mô tả';
+            if (isBookSlider) {
+                videoCard.innerHTML = `
+                    <a href="${videoId}" data-title="${title}" class="flex w-full h-full">
+                        <div class="content">
+                            <h3>${title}</h3>
+                            <p>${description}</p>
+                        </div>
+                        <img src="${thumbnail}" alt="${title}" class="object-cover" onerror="this.src='img/placeholder.jpg'">
+                    </a>
+                `;
+            } else {
+                videoCard.innerHTML = `
+                    <a href="${videoId}" data-title="${title}" class="w-full h-full object-cover">
+                        <img src="${thumbnail}" alt="${title}" class="w-full h-full object-cover" onerror="this.src='img/placeholder.jpg'">
+                    </a>
+                    <div class="content">
+                        <h3>${title}</h3>
+                        <p>${categories}</p>
+                    </div>
+                `;
+            }
+            return videoCard;
+        }
+        function displayCategorySection(category, filteredVideos) {
+            const categorySection = document.createElement("div");
+            categorySection.className = "category-section";
+            const headerDiv = document.createElement("div");
+            headerDiv.className = "flex justify-between items-center mb-4";
+            const h2 = document.createElement("h2");
+            h2.textContent = category;
+            headerDiv.appendChild(h2);
+            const viewAllBtn = document.createElement("a");
+            viewAllBtn.className = "view-all-btn";
+            viewAllBtn.textContent = "Xem tất cả";
+            viewAllBtn.href = `filter.html?filter=${encodeURIComponent(category)}`;
+            headerDiv.appendChild(viewAllBtn);
+            categorySection.appendChild(headerDiv);
+            const sliderContainer = document.createElement("div");
+            sliderContainer.className = "relative";
+            const categoryGrid = document.createElement("div");
+            categoryGrid.className = "category-grid";
+            categoryGrid.id = `category-grid-${category.toLowerCase().replace(/\s+/g, '-')}`;
+            filteredVideos.reverse().forEach((vid, index) => {
+                const videoCard = createVideoCard(vid, index, false);
+                categoryGrid.appendChild(videoCard);
+            });
+            sliderContainer.appendChild(categoryGrid);
+            const prevButton = document.createElement("button");
+            prevButton.className = "slider-nav prev";
+            prevButton.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            `;
+            prevButton.addEventListener("click", () => scrollSlider(categoryGrid.id, -200));
+            sliderContainer.appendChild(prevButton);
+            const nextButton = document.createElement("button");
+            nextButton.className = "slider-nav next";
+            nextButton.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            `;
+            nextButton.addEventListener("click", () => scrollSlider(categoryGrid.id, 200));
+            sliderContainer.appendChild(nextButton);
+            categorySection.appendChild(sliderContainer);
+            return categorySection;
+        }
+        function displayVideos(filter = "all", page = 1, searchQuery = "") {
+            const videoList = document.getElementById("video-list");
+            const categorySections = document.getElementById("category-sections");
+            const pagination = document.getElementById("pagination");
+            if (!videoList || !categorySections || !pagination) return;
+            videoList.innerHTML = '<p class="text-gray-400 text-center py-4">Đang tải video...</p>';
+            categorySections.innerHTML = '';
+            if (filter === "all") pagination.innerHTML = '';
+            let filteredVideos = filter === "all"
+                ? [...videos]
+                : filter === "Phim Bộ"
+                ? videos.filter(v => v.loai && v.loai.toLowerCase() === 'series')
+                : videos.filter(v => v.boloc && Array.isArray(v.boloc) && v.boloc.includes(filter));
+            if (searchQuery) {
+                filteredVideos = filteredVideos.filter(v =>
+                    getVideoTitle(v).toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+            if (filteredVideos.length === 0) {
+                videoList.innerHTML = `
+                    <div class="col-span-full text-center py-10">
+                        <p class="text-gray-400">Không tìm thấy video nào.</p>
+                    </div>
+                `;
+                if (filter !== "all") updatePagination(0, page);
+                return;
+            }
+            if (filter === "all" && !searchQuery) {
+                const categoriesBefore = ["Phim Hành Động", "Phim Hoạt Hình"];
+                categoriesBefore.forEach(category => {
+                    let categoryVideos = videos.filter(v => v.boloc && Array.isArray(v.boloc) && v.boloc.includes(category));
+                    if (categoryVideos.length > 0) {
+                        categorySections.appendChild(displayCategorySection(category, categoryVideos));
+                    }
+                });
+                const categoriesAfter = ["Phim Tình Cảm", "Phim Kinh Dị"];
+                categoriesAfter.forEach(category => {
+                    let categoryVideos = videos.filter(v => v.boloc && Array.isArray(v.boloc) && v.boloc.includes(category));
+                    if (categoryVideos.length > 0) {
+                        categorySections.appendChild(displayCategorySection(category, categoryVideos));
+                    }
+                });
+                videoList.innerHTML = '';
+            } else {
+                videoList.innerHTML = '';
+                const startIndex = (page - 1) * videosPerPage;
+                const endIndex = page * videosPerPage;
+                const videosToShow = filteredVideos.reverse().slice(startIndex, endIndex);
+                const videoGrid = document.createElement("div");
+                videoGrid.className = "category-grid";
+                videoGrid.id = `video-grid-${filter.toLowerCase().replace(/\s+/g, '-')}`;
+                videosToShow.forEach((vid, index) => {
+                    const videoCard = createVideoCard(vid, index, false);
+                    videoGrid.appendChild(videoCard);
+                });
+                videoList.appendChild(videoGrid);
+                const sliderContainer = document.createElement("div");
+                sliderContainer.className = "relative";
+                sliderContainer.appendChild(videoGrid);
+                const prevButton = document.createElement("button");
+                prevButton.className = "slider-nav prev";
+                prevButton.innerHTML = `
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                `;
+                prevButton.addEventListener("click", () => scrollSlider(videoGrid.id, -200));
+                sliderContainer.appendChild(prevButton);
+                const nextButton = document.createElement("button");
+                nextButton.className = "slider-nav next";
+                nextButton.innerHTML = `
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                `;
+                nextButton.addEventListener("click", () => scrollSlider(videoGrid.id, 200));
+                sliderContainer.appendChild(nextButton);
+                videoList.innerHTML = '';
+                videoList.appendChild(sliderContainer);
+                updatePagination(filteredVideos.length, page);
+            }
+        }
+        function updatePagination(totalVideos, currentPage) {
+            const pagination = document.getElementById("pagination");
+            if (!pagination) return;
+            pagination.innerHTML = "";
+            const totalPages = Math.ceil(totalVideos / videosPerPage);
+            if (totalPages === 0) return;
+            const createPageButton = (page, text, disabled = false) => {
+                const btn = document.createElement("button");
+                btn.className = `pagination-btn ${page === currentPage ? 'active' : ''}`;
+                btn.textContent = text;
+                btn.disabled = disabled;
+                if (!disabled) {
+                    btn.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        currentPage = page;
+                        const filter = new URLSearchParams(window.location.search).get('filter') || 'all';
+                        const searchQuery = new URLSearchParams(window.location.search).get('search') || '';
+                        displayVideos(filter, currentPage, searchQuery);
+                    });
+                }
+                pagination.appendChild(btn);
+            };
+            const maxPagesToShow = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+            if (endPage - startPage + 1 < maxPagesToShow) {
+                startPage = Math.max(1, endPage - maxPagesToShow + 1);
+            }
+            if (currentPage > 1) createPageButton(currentPage - 1, "Trước");
+            for (let i = startPage; i <= endPage; i++) createPageButton(i, i);
+            if (currentPage < totalPages) createPageButton(currentPage + 1, "Sau");
+        }
+        function scrollSlider(gridId, scrollAmount) {
+            const grid = document.getElementById(gridId);
+            grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+        function loadFeaturedMovies() {
+            fetch("phimtrangchu.json")
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    const carouselImages = document.getElementById("carousel-images");
+                    const featuredTitle = document.getElementById("featured-title");
+                    const featuredEpisodes = document.getElementById("featured-episodes");
+                    const featuredDescription = document.getElementById("featured-description");
+                    const featuredWatchBtn = document.getElementById("featured-watch-btn");
+                    const featuredPlayBtn = document.getElementById("featured-play-btn");
+                    const prevButton = document.getElementById("prev-slide");
+                    const nextButton = document.getElementById("next-slide");
+                    let currentIndex = 0;
+                    const slides = data;
+                    let intervalId;
+                    if (!slides || slides.length === 0) {
+                        featuredTitle.textContent = "Phim nổi bật";
+                        featuredEpisodes.textContent = "";
+                        featuredDescription.textContent = "";
+                        return;
+                    }
+                    slides.forEach((slide, index) => {
+                        const img = document.createElement("img");
+                        img.src = slide.anh || 'img/placeholder.jpg';
+                        img.alt = slide.TieuDe || 'Phim nổi bật';
+                        img.className = `featured-image carousel-slide ${index === 0 ? 'active' : ''}`;
+                        carouselImages.appendChild(img);
+                    });
+                    function updateOverlay(index) {
+                        const slide = slides[index];
+                        featuredTitle.textContent = slide.TieuDe || 'Phim nổi bật';
+                        if (slide.loai === "series" && slide.tap && slide.tap.length > 1) {
+                            featuredEpisodes.textContent = `${slide.tap.length} tập`;
+                        } else {
+                            featuredEpisodes.textContent = "";
+                        }
+                        featuredDescription.textContent = slide.moTa || 'Không có mô tả';
+                        featuredWatchBtn.href = slide.tap?.[0]?.video || '';
+                        featuredWatchBtn.setAttribute('data-title', slide.TieuDe || 'Phim nổi bật');
+                        featuredPlayBtn.href = slide.tap?.[0]?.video || '';
+                        featuredPlayBtn.setAttribute('data-title', slide.TieuDe || 'Phim nổi bật');
+                    }
+                    function changeSlide(newIndex) {
+                        const allSlides = document.querySelectorAll(".carousel-slide");
+                        allSlides[currentIndex].classList.remove("active");
+                        currentIndex = newIndex;
+                        allSlides[currentIndex].classList.add("active");
+                        updateOverlay(currentIndex);
+                        clearInterval(intervalId);
+                        startAutoSlide();
+                    }
+                    function nextSlide() {
+                        let newIndex = (currentIndex + 1) % slides.length;
+                        changeSlide(newIndex);
+                    }
+                    function prevSlide() {
+                        let newIndex = (currentIndex - 1 + slides.length) % slides.length;
+                        changeSlide(newIndex);
+                    }
+                    function startAutoSlide() {
+                        intervalId = setInterval(nextSlide, 5000);
+                    }
+                    updateOverlay(0);
+                    startAutoSlide();
+                    prevButton.addEventListener("click", prevSlide);
+                    nextButton.addEventListener("click", nextSlide);
+                })
+                .catch(error => {
+                    console.error("Lỗi tải phim nổi bật:", error);
+                    document.getElementById("featured-title").textContent = "Phim nổi bật";
+                    document.getElementById("featured-episodes").textContent = "";
+                    document.getElementById("featured-description").textContent = "";
+                });
+        }
+        function loadScrollingMovies() {
+            fetch("BoLoc1.json")
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    scrollingMovies = data.filter(v => v.tap && Array.isArray(v.tap) && v.tap.length > 0 && v.tap[0].video && v.Dang === '.m3u8');
+                    if (scrollingMovies.length === 0) {
+                        document.getElementById("scrolling-section").innerHTML = '<p class="text-gray-400 text-center">Không có phim để hiển thị.</p>';
+                        return;
+                    }
+                    const content = document.getElementById("scrolling-content");
+                    function createScrollingCards() {
+                        scrollingMovies.forEach((movie) => {
+                            const card = document.createElement("div");
+                            card.className = "scrolling-card";
+                            const title = getVideoTitle(movie);
+                            const thumbnail = movie.anh || 'img/placeholder.jpg';
+                            const videoId = movie.tap?.[0]?.video || '';
+                            card.innerHTML = `
+                                <a href="${videoId}" data-title="${title}">
+                                    <img src="${thumbnail}" alt="${title}" onerror="this.src='img/placeholder.jpg'">
+                                    <h3>${title}</h3>
+                                </a>
+                            `;
+                            content.appendChild(card);
+                        });
+                    }
+                    createScrollingCards();
+                    createScrollingCards();
+                })
+                .catch(error => {
+                    console.error("Lỗi tải danh sách phim từ BoLoc1.json:", error);
+                    document.getElementById("scrolling-section").innerHTML = '<p class="text-gray-400 text-center">Không thể tải danh sách phim.</p>';
+                });
+        }
+        function loadMovies(jsonFile, gridId) {
+            fetch(jsonFile)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    const movies = data.filter(v => v.tap && Array.isArray(v.tap) && v.tap.length > 0 && v.tap[0].video && v.Dang === '.m3u8');
+                    const grid = document.getElementById(gridId);
+                    if (movies.length === 0) {
+                        grid.innerHTML = '<p class="text-gray-400 text-center">Không có phim để hiển thị.</p>';
+                        return;
+                    }
+                    grid.innerHTML = '';
+                    movies.forEach((movie, index) => {
+                        const videoCard = createVideoCard(movie, index, gridId === 'korean-movies-grid' || gridId === 'recommended-movies-grid');
+                        grid.appendChild(videoCard);
+                    });
+                })
+                .catch(error => {
+                    console.error(`Lỗi tải ${jsonFile}:`, error);
+                    document.getElementById(gridId).innerHTML = '<p class="text-gray-400 text-center">Không thể tải danh sách phim.</p>';
+                });
+        }
+        function loadCustomFeaturedMovies() {
+            fetch("BoLoc3.json")
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    customFeaturedMovies = data.filter(v => v.tap && Array.isArray(v.tap) && v.tap.length > 0 && v.tap[0].video && v.Dang === '.m3u8');
+                    if (customFeaturedMovies.length === 0) {
+                        document.getElementById("custom-featured-section").innerHTML = '<p class="text-gray-400 text-center">Không có phim để hiển thị.</p>';
+                        return;
+                    }
+                    const carouselImages = document.getElementById("custom-carousel-images");
+                    const featuredTitle = document.getElementById("custom-featured-title");
+                    const featuredDescription = document.getElementById("custom-featured-description");
+                    const featuredWatchBtn = document.getElementById("custom-featured-watch-btn");
+                    const prevButton = document.getElementById("custom-prev-slide");
+                    const nextButton = document.getElementById("custom-next-slide");
+                    let currentIndex = 0;
+                    const slides = customFeaturedMovies;
+                    let intervalId;
+                    slides.forEach((slide, index) => {
+                        const img = document.createElement("img");
+                        img.src = slide.anh || 'img/placeholder.jpg';
+                        img.alt = slide.TieuDe || 'Phim';
+                        img.className = `custom-featured-image carousel-slide ${index === 0 ? 'active' : ''}`;
+                        carouselImages.appendChild(img);
+                    });
+                    function updateOverlay(index) {
+                        const slide = slides[index];
+                        featuredTitle.textContent = slide.TieuDe || 'Phim';
+                        featuredDescription.textContent = slide.moTa || 'Không có mô tả';
+                        featuredWatchBtn.href = slide.tap?.[0]?.video || '';
+                        featuredWatchBtn.setAttribute('data-title', slide.TieuDe || 'Phim');
+                    }
+                    function changeSlide(newIndex) {
+                        const allSlides = document.querySelectorAll("#custom-carousel-images .carousel-slide");
+                        allSlides[currentIndex].classList.remove("active");
+                        currentIndex = newIndex;
+                        allSlides[currentIndex].classList.add("active");
+                        updateOverlay(currentIndex);
+                        clearInterval(intervalId);
+                        startAutoSlide();
+                    }
+                    function nextSlide() {
+                        let newIndex = (currentIndex + 1) % slides.length;
+                        changeSlide(newIndex);
+                    }
+                    function prevSlide() {
+                        let newIndex = (currentIndex - 1 + slides.length) % slides.length;
+                        changeSlide(newIndex);
+                    }
+                    function startAutoSlide() {
+                        intervalId = setInterval(nextSlide, 5000);
+                    }
+                    updateOverlay(0);
+                    startAutoSlide();
+                    prevButton.addEventListener("click", prevSlide);
+                    nextButton.addEventListener("click", nextSlide);
+                })
+                .catch(error => {
+                    console.error("Lỗi tải BoLoc3.json:", error);
+                    document.getElementById("custom-featured-section").innerHTML = '<p class="text-gray-400 text-center">Không thể tải danh sách phim.</p>';
+                });
+        }
+        function showFavorites() {
+            alert('Chức năng Yêu Thích - Sẽ được implement sau');
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.addEventListener('click', (e) => {
+                const target = e.target.closest('a[href$=".m3u8"]');
+                if (target) {
+                    e.preventDefault();
+                    const m3u8Url = target.getAttribute('href');
+                    const title = target.getAttribute('data-title') || 'Video không có tiêu đề';
+                    const encodedUrl = encodeURIComponent(m3u8Url);
+                    const encodedTitle = encodeURIComponent(title);
+                    window.location.href = `watch.html?id=${encodedUrl}&title=${encodedTitle}`;
+                }
+            });
+            loadFeaturedMovies();
+            loadScrollingMovies();
+            loadMovies("BoLoc2.json", "korean-movies-grid");
+            loadMovies("BoLoc4.json", "recommended-movies-grid");
+            loadCustomFeaturedMovies();
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter') || 'all';
+            const search = urlParams.get('search') || '';
+            displayVideos(filter, 1, search);
+            document.body.addEventListener('click', (e) => {
+                if (e.target === document.body || e.target.classList.contains('container')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+            document.addEventListener("keydown", (e) => {
+                const grids = document.querySelectorAll(".category-grid, .book-slider");
+                grids.forEach(grid => {
+                    if (e.key === "ArrowLeft") {
+                        scrollSlider(grid.id, -360);
+                    } else if (e.key === "ArrowRight") {
+                        scrollSlider(grid.id, 360);
+                    }
+                });
+            });
+            fetch("phim.json")
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    videos = data.filter(v => v.tap && Array.isArray(v.tap) && v.tap.length > 0 && v.tap[0].video && v.Dang === '.m3u8');
+                    if (videos.length === 0) {
+                        document.getElementById("video-list").innerHTML = `
+                            <div class="col-span-full text-center py-10">
+                                <p class="text-gray-400">Không có video hợp lệ trong phim.json.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    displayVideos(filter, 1, search);
+                })
+                .catch(error => {
+                    console.error("Lỗi tải danh sách video:", error);
+                    document.getElementById("video-list").innerHTML = `
+                        <div class="col-span-full text-center py-10">
+                            <p class="text-gray-400">Không thể tải danh sách video.</p>
+                        </div>
+                    `;
+                });
+        });
+        if (window.innerWidth > 640) {
+            document.body.style.maxWidth = '640px';
+            document.body.style.margin = '0 auto';
+        }
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 640) {
+                document.body.style.maxWidth = '640px';
+                document.body.style.margin = '0 auto';
+            }
+        });
+    </script>
+</body>
+</html>

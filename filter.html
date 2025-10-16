@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bộ Lọc Phim | CoInPhIm</title>
+    <link rel="icon" type="image/png" href="img/image2-fotor-20250813113121.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0a0a0a',
+                            800: '#121212',
+                            700: '#1a1a1a',
+                            600: '#222222',
+                            500: '#2a2a2a',
+                        },
+                        netflix: {
+                            red: '#e50914',
+                        },
+                        glass: {
+                            bg: 'rgba(255, 255, 255, 0.05)',
+                            border: 'rgba(255, 255, 255, 0.1)',
+                        }
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                        sm: '4px',
+                        md: '8px',
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e5e5e5;
+            margin: 0;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .logo:hover {
+            color: #e50914;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #e50914, #b20710);
+            color: #fff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+        }
+
+        .filter-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            padding: 1rem;
+            border-radius: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-inner {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e5e5e5;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1rem;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #e50914;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 12px rgba(229, 9, 20, 0.3);
+        }
+
+        .filter-select {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e5e5e5;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1rem;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9rem;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #e50914;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 12px rgba(229, 9, 20, 0.3);
+        }
+
+        .filter-select option {
+            background: #2a2a2a;
+            color: #e5e5e5;
+        }
+
+        .discord-btn {
+            background: linear-gradient(135deg, #7289da, #5865f2);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .discord-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(114, 137, 218, 0.3);
+        }
+
+        #video-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            padding: 0 0.5rem;
+        }
+
+        .video-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: calc(var(--index) * 0.1s);
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(229, 9, 20, 0.2);
+        }
+
+        .video-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .video-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .video-card .content {
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .video-card .content h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.25rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 44px;
+        }
+
+        .video-card .content p {
+            font-size: 0.75rem;
+            color: #b3b3b3;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .pagination-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e5e5e5;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination-btn:hover {
+            background: #e50914;
+            border-color: #e50914;
+            color: #fff;
+        }
+
+        .pagination-btn.active {
+            background: #e50914;
+            border-color: #e50914;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(12px);
+            padding: 0.75rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #e5e5e5;
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bottom-nav-btn:hover,
+        .bottom-nav-btn.active {
+            color: #e50914;
+            background: rgba(229, 9, 20, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            margin-bottom: 0.25rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                max-width: 640px;
+                padding: 1.5rem;
+            }
+
+            .filter-inner {
+                flex-direction: row;
+                gap: 0.75rem;
+            }
+
+            .search-input,
+            .filter-select,
+            .discord-btn {
+                width: auto;
+                flex: 1;
+            }
+
+            #video-list {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.25rem;
+            }
+
+            .video-card img {
+                height: 240px;
+            }
+
+            .video-card .content h3 {
+                font-size: 1rem;
+                min-height: 48px;
+            }
+
+            .video-card .content p {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 960px;
+            }
+
+            #video-list {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+            }
+
+            .video-card img {
+                height: 260px;
+            }
+
+            .video-card .content h3 {
+                font-size: 1.1rem;
+                min-height: 52px;
+            }
+
+            .video-card .content p {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-gray-200">
+    <div class="container">
+        <div class="filter-container">
+            <div class="filter-inner">
+                <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm phim...">
+                <select id="filter-select" class="filter-select">
+                    <!-- Filter options will be dynamically added here -->
+                </select>
+                <a href="https://discord.gg/uqNA78fs9G" target="_blank" class="discord-btn">Discord</a>
+            </div>
+        </div>
+        <div id="video-list"></div>
+        <div id="pagination" class="pagination"></div>
+    </div>
+
+    <script>
+        let videos = [];
+        const videosPerPage = 20;
+        let currentPage = 1;
+
+        function getVideoTitle(video) {
+            return video.TieuDe && video.TieuDe.trim() !== '' 
+                ? video.TieuDe 
+                : extractTitleFromUrl(video.tap?.[0]?.video) || 'Video không có tiêu đề';
+        }
+
+        function extractTitleFromUrl(url) {
+            if (!url) return null;
+            try {
+                const decodedUrl = decodeURIComponent(url);
+                const match = decodedUrl.match(/\/video\.[^/]+\/(.+)$/);
+                if (match && match[1] && match[1] !== '_') {
+                    return match[1]
+                        .replace(/_/g, ' ')
+                        .replace(/\b\w/g, c => c.toUpperCase())
+                        .replace(/%20/g, ' ');
+                }
+                return null;
+            } catch (e) {
+                console.error('Error parsing video title:', e);
+                return null;
+            }
+        }
+
+        function createVideoCard(vid, index) {
+            const videoCard = document.createElement("div");
+            videoCard.className = "video-card";
+            videoCard.style.setProperty('--index', index);
+
+            const title = getVideoTitle(vid);
+            const thumbnail = vid.anh || 'img/placeholder.jpg';
+            const categories = Array.isArray(vid.boloc) ? vid.boloc.join(", ") : 'Không có thể loại';
+            const videoId = vid.tap?.[0]?.video || '';
+
+            videoCard.innerHTML = `
+                <a href="watch.html?id=${encodeURIComponent(videoId)}&title=${encodeURIComponent(title)}">
+                    <img src="${thumbnail}" alt="${title}" class="w-full h-full object-cover" onerror="this.src='img/placeholder.jpg'">
+                </a>
+                <div class="content">
+                    <h3>${title}</h3>
+                    <p>${categories}</p>
+                </div>
+            `;
+
+            return videoCard;
+        }
+
+        function displayVideos(filter = "all", page = 1, searchQuery = "") {
+            const videoList = document.getElementById("video-list");
+            const pagination = document.getElementById("pagination");
+            if (!videoList || !pagination) return;
+
+            videoList.innerHTML = '<p class="text-gray-400 text-center py-4">Đang tải video...</p>';
+
+            let filteredVideos = filter === "all"
+                ? [...videos].reverse()
+                : filter === "Phim Bộ"
+                ? videos.filter(v => v.loai && v.loai.toLowerCase() === 'series').reverse()
+                : filter === "Thuyết Minh"
+                ? videos.filter(v => Array.isArray(v.ThuyetMinh) && v.ThuyetMinh.length > 0).reverse()
+                : filter === "Lồng Tiếng"
+                ? videos.filter(v => Array.isArray(v.LongTieng) && v.LongTieng.length > 0).reverse()
+                : videos.filter(v => v.boloc && Array.isArray(v.boloc) && v.boloc.includes(filter)).reverse();
+
+            if (searchQuery) {
+                filteredVideos = filteredVideos.filter(v =>
+                    getVideoTitle(v).toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+
+            if (filteredVideos.length === 0) {
+                videoList.innerHTML = `
+                    <div class="col-span-full text-center py-10">
+                        <p class="text-gray-400">Không tìm thấy video nào.</p>
+                    </div>
+                `;
+                updatePagination(0, page);
+                return;
+            }
+
+            videoList.innerHTML = '';
+            const startIndex = (page - 1) * videosPerPage;
+            const endIndex = page * videosPerPage;
+            const videosToShow = filteredVideos.slice(startIndex, endIndex);
+
+            videosToShow.forEach((vid, index) => {
+                const videoCard = createVideoCard(vid, index);
+                videoList.appendChild(videoCard);
+            });
+
+            updatePagination(filteredVideos.length, page);
+        }
+
+        function updatePagination(totalVideos, currentPage) {
+            const pagination = document.getElementById("pagination");
+            if (!pagination) return;
+
+            pagination.innerHTML = "";
+            const totalPages = Math.ceil(totalVideos / videosPerPage);
+
+            if (totalPages === 0) return;
+
+            const createPageButton = (page, text, disabled = false) => {
+                const btn = document.createElement("button");
+                btn.className = `pagination-btn ${page === currentPage ? 'active' : ''}`;
+                btn.textContent = text;
+                btn.disabled = disabled;
+                if (!disabled) {
+                    btn.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        currentPage = page;
+                        const filter = document.getElementById("filter-select").value || 'all';
+                        const searchQuery = document.getElementById("search-input").value || '';
+                        displayVideos(filter, currentPage, searchQuery);
+                    });
+                }
+                pagination.appendChild(btn);
+            };
+
+            const maxPagesToShow = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+            if (endPage - startPage + 1 < maxPagesToShow) {
+                startPage = Math.max(1, endPage - maxPagesToShow + 1);
+            }
+
+            if (currentPage > 1) createPageButton(currentPage - 1, "Trước");
+            for (let i = startPage; i <= endPage; i++) createPageButton(i, i);
+            if (currentPage < totalPages) createPageButton(currentPage + 1, "Sau");
+        }
+
+        function createFilterDropdown(filters) {
+            const filterSelect = document.getElementById("filter-select");
+            if (!filterSelect) return;
+
+            filterSelect.innerHTML = '';
+
+            filters.forEach(filter => {
+                const option = document.createElement("option");
+                option.value = filter;
+                option.textContent = filter === 'all' ? 'Tất cả' : filter;
+                filterSelect.appendChild(option);
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter') || 'all';
+            filterSelect.value = filter;
+
+            filterSelect.addEventListener("change", () => {
+                const selectedFilter = filterSelect.value;
+                const searchQuery = document.getElementById("search-input").value;
+                currentPage = 1;
+                displayVideos(selectedFilter, currentPage, searchQuery);
+            });
+        }
+
+        function showFavorites() {
+            alert('Chức năng Yêu Thích - Sẽ được implement sau');
+        }
+
+        function showWatchlist() {
+            alert('Chức năng Xem - Sẽ được implement sau');
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter') || 'all';
+            const search = urlParams.get('search') || '';
+
+            document.getElementById("search-input").value = search;
+
+            document.getElementById("search-input").addEventListener("input", (e) => {
+                const selectedFilter = document.getElementById("filter-select").value || 'all';
+                const searchQuery = e.target.value;
+                currentPage = 1;
+                displayVideos(selectedFilter, currentPage, searchQuery);
+            });
+
+            fetch("phim.json")
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    videos = data.filter(v => v.tap && Array.isArray(v.tap) && v.tap.length > 0 && v.tap[0].video && v.Dang === '.m3u8');
+                    if (videos.length === 0) {
+                        document.getElementById("video-list").innerHTML = `
+                            <div class="col-span-full text-center py-10">
+                                <p class="text-gray-400">Không có video hợp lệ trong phim.json.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    const filters = new Set(['all']);
+                    videos.forEach(video => {
+                        if (Array.isArray(video.boloc)) {
+                            video.boloc.forEach(filter => filters.add(filter));
+                        }
+                        if (Array.isArray(video.ThuyetMinh) && video.ThuyetMinh.length > 0) {
+                            filters.add("Thuyết Minh");
+                        }
+                        if (Array.isArray(video.LongTieng) && video.LongTieng.length > 0) {
+                            filters.add("Lồng Tiếng");
+                        }
+                    });
+
+                    createFilterDropdown([...filters]);
+                    displayVideos(filter, 1, search);
+                })
+                .catch(error => {
+                    console.error("Lỗi tải danh sách video:", error);
+                    document.getElementById("video-list").innerHTML = `
+                        <div class="col-span-full text-center py-10">
+                            <p class="text-gray-400">Không thể tải danh sách video.</p>
+                        </div>
+                    `;
+                });
+        });
+    </script>
+</body>
+</html>

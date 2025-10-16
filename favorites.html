@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yêu Thích | CoInPhIm</title>
+    <link rel="icon" type="image/png" href="img/image2-fotor-20250813113121.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0a0a0a',
+                            800: '#121212',
+                            700: '#1a1a1a',
+                            600: '#222222',
+                            500: '#2a2a2a',
+                        },
+                        netflix: {
+                            red: '#e50914',
+                        }
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+            margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        #favorites-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            min-height: 200px;
+        }
+
+        #favorites-list .favorite-card {
+            transition: all 0.3s ease-in-out;
+            background-color: #1a1a1a;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: calc(var(--index) * 0.1s);
+            position: relative;
+        }
+
+        #favorites-list .favorite-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        #favorites-list .favorite-card img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        #favorites-list .favorite-card:hover img {
+            transform: scale(1.1);
+        }
+
+        #favorites-list .favorite-card .content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            height: 90px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        #favorites-list .favorite-card .content h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 52px;
+            max-height: 52px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        #favorites-list .favorite-card .content p {
+            font-size: 0.85rem;
+            color: #e5e5e5;
+            margin-top: 0.5rem;
+            line-clamp: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 20px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(229, 9, 20, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .remove-btn:hover {
+            background-color: #c10812;
+            transform: scale(1.1);
+        }
+
+        .no-favorites {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-size: 1rem;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .bottom-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: #e5e5e5;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            min-width: 60px;
+            gap: 0.25rem;
+        }
+
+        .bottom-nav-btn:hover,
+        .bottom-nav-btn.active {
+            background: rgba(229, 9, 20, 0.2);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0.75rem;
+            }
+
+            #favorites-list {
+                grid-template-columns: repeat(2, minmax(140px, 1fr));
+                gap: 0.75rem;
+            }
+
+            #favorites-list .favorite-card img {
+                height: 200px;
+            }
+
+            #favorites-list .favorite-card .content {
+                height: 70px;
+                padding: 0.5rem;
+            }
+
+            #favorites-list .favorite-card .content h3 {
+                font-size: 0.875rem;
+                min-height: 40px;
+                max-height: 40px;
+            }
+
+            #favorites-list .favorite-card .content p {
+                font-size: 0.75rem;
+                min-height: 16px;
+            }
+
+            .remove-btn {
+                width: 25px;
+                height: 25px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (min-width: 641px) and (max-width: 1024px) {
+            #favorites-list {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 1rem;
+            }
+
+            #favorites-list .favorite-card img {
+                height: 300px;
+            }
+
+            #favorites-list .favorite-card .content {
+                height: 80px;
+            }
+
+            #favorites-list .favorite-card .content h3 {
+                font-size: 1rem;
+                min-height: 48px;
+                max-height: 48px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-dark-900 text-gray-200">
+    <div class="container">
+        <div class="header">
+           
+        </div>
+        <h1 class="text-2xl font-bold text-white mb-4 text-center">Danh sách Phim Yêu Thích</h1>
+        <div id="favorites-list"></div>
+        <div id="no-favorites" class="no-favorites hidden">Bạn chưa có phim yêu thích nào.</div>
+    </div>
+
+    
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+
+    <script>
+        // Cookie handling functions
+        function setCookie(name, value, seconds) {
+            const date = new Date();
+            date.setTime(date.getTime() + (seconds * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/;SameSite=Strict";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.indexOf(nameEQ) === 0) {
+                    return decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                }
+            }
+            return null;
+        }
+
+        function getFavorites() {
+            const favorites = getCookie("favorites");
+            try {
+                return favorites ? JSON.parse(favorites) : [];
+            } catch (e) {
+                console.error("Lỗi khi phân tích cookie favorites:", e);
+                return [];
+            }
+        }
+
+        function removeFavorite(encodedVideoId) {
+            const videoId = decodeURIComponent(encodedVideoId); // Decode the videoId
+            let favorites = getFavorites();
+            favorites = favorites.filter(fav => fav.videoId !== videoId);
+            setCookie("favorites", JSON.stringify(favorites), 30 * 24 * 60 * 60);
+            loadFavorites();
+            alert('Đã xóa phim khỏi danh sách yêu thích!');
+        }
+
+        function loadFavorites() {
+            const favoritesList = document.getElementById("favorites-list");
+            const noFavorites = document.getElementById("no-favorites");
+            favoritesList.innerHTML = '';
+            const favorites = getFavorites();
+            if (favorites.length === 0) {
+                noFavorites.classList.remove('hidden');
+            } else {
+                noFavorites.classList.add('hidden');
+                favorites.forEach((fav, index) => {
+                    const favoriteCard = document.createElement("div");
+                    favoriteCard.className = "favorite-card";
+                    favoriteCard.style.setProperty('--index', index);
+                    favoriteCard.innerHTML = `
+                        <a href="watch.html?id=${encodeURIComponent(fav.videoId)}&title=${encodeURIComponent(fav.title)}">
+                            <img src="${fav.thumbnail}" alt="${fav.title}" onerror="this.src='img/placeholder.jpg'">
+                        </a>
+                        <div class="content">
+                            <h3>${fav.title}</h3>
+                            <p>${fav.categories}</p>
+                        </div>
+                        <button class="remove-btn" onclick="removeFavorite('${encodeURIComponent(fav.videoId)}')">×</button>
+                    `;
+                    favoritesList.appendChild(favoriteCard);
+                });
+            }
+        }
+
+        function showWatchlist() {
+            const currentWatching = getCookie("currentWatchingVideo");
+            try {
+                const current = currentWatching ? JSON.parse(currentWatching) : null;
+                if (current && current.videoId && current.title) {
+                    window.location.href = `watch.html?id=${encodeURIComponent(current.videoId)}&title=${encodeURIComponent(current.title)}`;
+                } else {
+                    alert('Hiện tại bạn chưa xem video nào. Vui lòng chọn một video để xem!');
+                    window.location.href = 'index.html';
+                }
+            } catch (e) {
+                console.error("Lỗi khi phân tích cookie currentWatchingVideo:", e);
+                alert('Hiện tại bạn chưa xem video nào. Vui lòng chọn một video để xem!');
+                window.location.href = 'TrangChu.html';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadFavorites();
+        });
+    </script>
+</body>
+</html>

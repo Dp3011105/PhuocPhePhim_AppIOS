@@ -1,0 +1,242 @@
+[
+  {
+    "id": "movie_19a4c930",
+    "TieuDe": "Venom: Kèo cuối",
+    "anh": "https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/3/image/c5f0a1eff4c394a251036189ccddaacd/r/s/rsz_vnm3_intl_online_1080x1350_tsr_01.jpg",
+    "boloc": [
+      "Phim Chiếu Rạp",
+      "Phim Hành Động"
+    ],
+    "loai": "movie",
+    "tap": [
+      {
+        "tapSo": null,
+        "video": "https://dash.motchills.net/raw/19a4c93039525dd4ae38e83022243584/index.m3u8",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "00:35",
+        "subtitle": ""
+      }
+    ],
+    "Dang": ".m3u8",
+    "moTa": "",
+    "ThuyetMinh": [],
+    "LongTieng": []
+  },
+  {
+    "id": "movie_KZ3IDVB4",
+    "TieuDe": "Sói Già Phố Wall 2013",
+    "anh": "https://upload.wikimedia.org/wikipedia/vi/d/d8/The_Wolf_of_Wall_Street_%282013%29.png",
+    "boloc": [
+      "Phim Chiếu Rạp"
+    ],
+    "loai": "movie",
+    "tap": [
+      {
+        "tapSo": null,
+        "video": "https://s2.phim1280.tv/20231019/KZ3IDVB4/index.m3u8",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "00:42",
+        "subtitle": ""
+      }
+    ],
+    "Dang": ".m3u8",
+    "moTa": "",
+    "ThuyetMinh": [],
+    "LongTieng": []
+  },
+  {
+    "id": "movie_hx7z3ckv9",
+    "TieuDe": "Ngược Dòng Cuộc Đời",
+    "anh": "https://static.nutscdn.com/vimg/300-0/b9a7713eab1704c63508ed998790380d.jpg",
+    "moTa": "",
+    "loai": "movie",
+    "Dang": ".m3u8",
+    "boloc": [
+      "Phim Tình Cảm"
+    ],
+    "ThuyetMinh": [
+      "movie_9677rgkjt"
+    ],
+    "LongTieng": [],
+    "tap": [
+      {
+        "tapSo": null,
+        "video": "https://sundaythekingplays.site/hls/31FePxKe11ho-NczRJvE16KtqToHJCnYFbPHHew3a9z-S+D3Xn+wSluTm42+vZTeZQWI5p6I1HzZe8xsBr3I0A==/aW5kZXgtZjEtdjEtYTEubTN1OA==.m3u8",
+        "subtitle": "https://static.nutscdn.com/vcc/1/dd812b29face5f388e91109ae6bae2bb/vie-7.vtt",
+        "GioiThieuBatDau": "",
+        "GioiThieuKetThuc": ""
+      }
+    ]
+  },
+  {
+    "id": "movie_shbi64gj8",
+    "TieuDe": "Ông Chồng Nội Trợ",
+    "anh": "https://static.nutscdn.com/vimg/300-0/c7427713f80b0822610371000bb77356.jpg",
+    "moTa": "",
+    "loai": "series",
+    "Dang": ".m3u8",
+    "boloc": [
+      "Phim Hoạt Hình"
+    ],
+    "ThuyetMinh": [],
+    "LongTieng": [],
+    "tap": [
+      {
+        "tapSo": 1,
+        "video": "https://quetinuk271.site/hls/HnWZXUsRDnRNPmuRRZrGYFJKDPk3lzaH4uTjbAMAxDFXmABD6H0n-dzQ-MRj1P47WWApNrPFHflUDB9nx5q6Nw==/aW5kZXgtZjEtdjEtYTEubTN1OA==.m3u8",
+        "subtitle": "https://static.nutscdn.com/vcc/1/0d5956a6093e5c23ed769cb98d6e1b41/1750307843.vtt",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "01:27"
+      },
+      {
+        "tapSo": 2,
+        "video": "https://sundaythekingplays.xyz/hls/Kmw9R4hmIM-A69P6LkedVhB96hBvNixXtU9iamK0xvogmyLgoEFAxcvy9y+B3F13mOO6rMkVQQtRh5ychuahpA==/aW5kZXgtZjEtdjEtYTEubTN1OA==.m3u8",
+        "subtitle": "https://static.nutscdn.com/vcc/1/331e8d85defabf6a57d029b17a8e2939/1750308071.vtt",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "01:27"
+      },
+      {
+        "tapSo": 3,
+        "video": "https://quetinuk271.site/hls/ogXYAI3FSNHS8dnAJ2q2slr4BTGBbZ-iHNYvaUBtyKl2VCYPGR4+5GoHX-zPwroEo7bO8aoVgn3pxoMrsIhLww==/aW5kZXgtZjEtdjEtYTEubTN1OA==.m3u8",
+        "subtitle": "https://static.nutscdn.com/vcc/1/82f7d3ed0dbd136c0f88ef21f24e36b0/1750303777.vtt",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "01:27"
+      },
+      {
+        "tapSo": 4,
+        "video": "https://quetinuk271.site/hls/9sYlW0CQS6HkhdR3uY-W0AGeSlWmmYt0HVpMO9tDrm3DaRgyzaeTDRWAafbFnYNx+9zXPEF5PrVkMDCYEwhVMA==/aW5kZXgtZjEtdjEtYTEubTN1OA==.m3u8",
+        "subtitle": "https://static.nutscdn.com/vcc/1/780895bbcb116e49c35f16868da1a465/1750303697.vtt",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "01:27"
+      },
+      {
+        "tapSo": 5,
+        "video": "https://snowbreeze49.live/hls/lWNG2dzIh+LEqLQ0x+2r4VvUnUwf9dvOZTRYUi7kFadGLTfB+1uwQ-ADTeKvf7oFta2uirQLxU37zKEbXn4UgA==/aW5kZXgtZjEtdjEtYTEubTN1OA==.m3u8",
+        "subtitle": "https://static.nutscdn.com/vcc/1/1f2c056d097baf381da02e0d63f4f216/1750302999.vtt",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "01:27"
+      }
+    ]
+  },
+  {
+    "id": "movie_67jw4v2xh",
+    "TieuDe": "The Boys: Season 1 (2019)",
+    "anh": "https://motchills.fm/wp-content/uploads/2024/12/sieu-anh-hung-pha-hoai-phan-1-8679-thumb.webp",
+    "moTa": "",
+    "loai": "series",
+    "Dang": ".m3u8",
+    "boloc": [
+      "Phim Hành Động",
+      "Phim Bộ",
+      "Phim Kinh Dị"
+    ],
+    "tap": [
+      {
+        "tapSo": 1,
+        "video": "https://s3.phim1280.tv/20240507/RKsuOm4s/index.m3u8",
+        "subtitle": "",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "00:27"
+      },
+      {
+        "tapSo": 2,
+        "video": "https://s3.phim1280.tv/20240507/sRnif2vw/index.m3u8",
+        "subtitle": "",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "00:00"
+      },
+      {
+        "tapSo": 3,
+        "video": "https://s3.phim1280.tv/20240507/owDA6a7H/index.m3u8",
+        "subtitle": "",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "00:00"
+      },
+      {
+        "tapSo": 4,
+        "video": "https://s3.phim1280.tv/20240507/uLM18yUO/index.m3u8",
+        "subtitle": "",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "00:00"
+      },
+      {
+        "tapSo": 5,
+        "video": "https://s3.phim1280.tv/20240507/EiHMzqMl/index.m3u8",
+        "subtitle": "",
+        "GioiThieuBatDau": "00:00",
+        "GioiThieuKetThuc": "00:00"
+      },
+      {
+        "tapSo": 6,
+        "video": "https://s3.phim1280.tv/20240507/MzTuwctm/index.m3u8",
+        "subtitle": "",
+        "GioiThieuBatDau": "",
+        "GioiThieuKetThuc": ""
+      },
+      {
+        "tapSo": 7,
+        "video": "https://s3.phim1280.tv/20240507/W5X9ba7I/index.m3u8",
+        "subtitle": "",
+        "GioiThieuBatDau": "",
+        "GioiThieuKetThuc": ""
+      },
+      {
+        "tapSo": 8,
+        "video": "https://s3.phim1280.tv/20240507/uBKkS1eq/index.m3u8",
+        "subtitle": "",
+        "GioiThieuBatDau": "",
+        "GioiThieuKetThuc": ""
+      }
+    ],
+    "ThuyetMinh": [],
+    "LongTieng": []
+  },
+   {
+    "id": "movie_o18fwd974",
+    "TieuDe": "Shang-Chi và Huyền Thoại Thập Luân",
+    "anh": "https://static.nutscdn.com/vimg/300-0/89a17bcb157a0e3026fecd6e9c8533be.jpg",
+    "moTa": "",
+    "loai": "movie",
+    "Dang": ".m3u8",
+    "boloc": [
+      "Phim Chiếu Rạp",
+      "Phim Hành Động"
+    ],
+    "ThuyetMinh": [
+      "movie_gmm73bfe1"
+    ],
+    "LongTieng": [],
+    "tap": [
+      {
+        "tapSo": null,
+        "video": "https://snowbreeze49.live/hls/2eIZiMtqMbBVL72WLaZVJXRtrklDaqeC3wMj3pOx-t7vG3E0bZulJ631k-v+k3iBFDlaOLvrsBVXhdCjgOfbmfbil8v-XsVWxpTdfXHWPVY=/aW5kZXgtZjMtdjEtYTEubTN1OA==.m3u8",
+        "subtitle": "https://static.nutscdn.com/vcc/2/35c1998c54c7c4c5898009af303c3ddd/1744020208.vtt",
+        "GioiThieuBatDau": "",
+        "GioiThieuKetThuc": ""
+      }
+    ]
+  },
+  {
+    "id": "movie_2fpx857ow",
+    "TieuDe": "Đảo Hải Tặc 10: Thế Giới Sức Mạnh",
+    "anh": "https://static.nutscdn.com/vimg/300-0/4b0b68566d30eccd5e5ead084646e60c.jpg",
+    "moTa": "",
+    "loai": "movie",
+    "Dang": ".m3u8",
+    "boloc": [
+      "Phim Hoạt Hình"
+    ],
+    "ThuyetMinh": [],
+    "LongTieng": [],
+    "tap": [
+      {
+        "tapSo": null,
+        "video": "https://hitmefirstcdn.store/hls/63Ixy7Gw7TGruQLa1KlC5phmQWaEhqM2L4aBpq+FmsjzICEOdyGWYFPz7NdcpZLYjbEXGfecC+auRsjqUfjjyQ==/aW5kZXgtZjEtdjEtYTEubTN1OA==.m3u8",
+        "subtitle": "https://static.nutscdn.com/vcc/1/8bb554bf96ad2b11a3c7ae60622af2c4/vie-5.vtt",
+        "GioiThieuBatDau": "",
+        "GioiThieuKetThuc": ""
+      }
+    ]
+  }
+
+]

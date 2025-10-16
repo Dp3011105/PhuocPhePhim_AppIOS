@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Phim</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .filter-section {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .filter-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            min-height: 100px;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-item input {
+            width: auto;
+            margin-right: 5px;
+        }
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .movie-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .movie-poster {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        .movie-info {
+            padding: 15px;
+        }
+        .movie-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+        .movie-meta {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .movie-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            min-height: 100px;
+        }
+        .episode-list {
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .episode-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .episode-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .episode-inputs {
+            flex-grow: 1;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-working {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .status-error {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .status-unknown {
+            background-color: #f39c12;
+            color: white;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .preview-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background-color: #000;
+            position: relative;
+        }
+        .preview-video {
+            width: 100%;
+            height: 300px;
+            background-color: #000;
+        }
+        .preview-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .custom-filter-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .custom-filter-input input {
+            flex-grow: 1;
+        }
+        .custom-filter-list {
+            margin-top: 10px;
+            max-height: 100px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quản Lý Phim</h1>
+        
+        <div class="toolbar">
+            <div>
+                <button id="addMovieBtn" class="btn btn-primary">Thêm Phim Mới</button>
+                <button id="checkLinksBtn" class="btn btn-warning">Kiểm Tra Link</button>
+            </div>
+            <div>
+                <button id="copyJsonBtn" class="btn btn-success">Sao Chép JSON</button>
+                <button id="reloadDataBtn" class="btn">Tải Lại Dữ Liệu</button>
+            </div>
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="searchInput">Tìm kiếm:</label>
+                <input type="text" id="searchInput" placeholder="Nhập tiêu đề phim...">
+            </div>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="all">Tất Cả</button>
+                    <button class="tab-button" data-tab="movies">Phim Lẻ</button>
+                    <button class="tab-button" data-tab="series">Phim Bộ</button>
+                    <button class="tab-button" data-tab="issues">Có Vấn Đề</button>
+                </div>
+            </div>
+            
+            <div class="filter-group">
+                <label>Bộ lọc:</label>
+                <div id="filterCheckboxGroup" class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="filterTheater" checked>
+                        <label for="filterTheater">Phim Chiếu Rạp</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="filterAction" checked>
+                        <label for="filterAction">Phim Hành Động</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="filterSeries" checked>
+                        <label for="filterSeries">Phim Bộ</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="filterAnimation" checked>
+                        <label for="filterAnimation">Phim Hoạt Hình</label>
+                    </div>
+                    <!-- Các bộ lọc động sẽ được thêm vào đây -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="movieGrid" class="movie-grid">
+            <!-- Phim sẽ được hiển thị ở đây -->
+        </div>
+    </div>
+    
+    <!-- Modal Thêm/Sửa Phim -->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2 id="modalTitle">Thêm Phim Mới</h2>
+            <form id="movieForm">
+                <input type="hidden" id="movieId">
+                
+                <div class="form-group">
+                    <label for="movieTitle">Tiêu đề:</label>
+                    <input type="text" id="movieTitle" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="movieImage">Ảnh:</label>
+                    <input type="text" id="movieImage" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="movieDescription">Mô tả:</label>
+                    <textarea id="movieDescription" placeholder="Mô tả phim..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Loại phim:</label>
+                    <select id="movieType" required>
+                        <option value="movie">Phim Lẻ</option>
+                        <option value="series">Phim Bộ</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Định dạng:</label>
+                    <select id="movieFormat" required>
+                        <option value=".m3u8">.m3u8 (HLS)</option>
+                        <option value="iframe">iframe</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Bộ lọc:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="filterTheaterInput" value="Phim Chiếu Rạp">
+                            <label for="filterTheaterInput">Phim Chiếu Rạp</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="filterActionInput" value="Phim Hành Động">
+                            <label for="filterActionInput">Phim Hành Động</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="filterAnimationInput" value="Phim Hoạt Hình">
+                            <label for="filterAnimationInput">Phim Hoạt Hình</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="filterThuyetMinhInput" value="Thuyết Minh">
+                            <label for="filterThuyetMinhInput">Thuyết Minh</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="filterLongTiengInput" value="Lồng Tiếng">
+                            <label for="filterLongTiengInput">Lồng Tiếng</label>
+                        </div>
+                        <!-- Các bộ lọc động sẽ được thêm vào đây -->
+                    </div>
+                    <div class="custom-filter-input">
+                        <input type="text" id="newFilterInput" placeholder="Nhập bộ lọc mới...">
+                        <button type="button" id="addFilterBtn" class="btn btn-primary">Thêm</button>
+                    </div>
+                    <div id="customFilterList" class="custom-filter-list">
+                        <!-- Danh sách bộ lọc tùy chỉnh sẽ được hiển thị ở đây -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="thuyetMinhMovies">Phim Thuyết Minh:</label>
+                    <select id="thuyetMinhMovies" multiple>
+                        <!-- Danh sách phim sẽ được thêm vào đây -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="longTiengMovies">Phim Lồng Tiếng:</label>
+                    <select id="longTiengMovies" multiple>
+                        <!-- Danh sách phim sẽ được thêm vào đây -->
+                    </select>
+                </div>
+                
+                <div id="episodesContainer" class="form-group" style="display: none;">
+                    <label>Tập phim:</label>
+                    <div id="episodeList" class="episode-list">
+                        <!-- Các tập phim sẽ được thêm vào đây -->
+                    </div>
+                    <button type="button" id="addEpisodeBtn" class="btn btn-primary">Thêm Tập</button>
+                </div>
+                
+                <div id="singleEpisodeContainer" class="form-group">
+                    <label for="movieVideo">Link video:</label>
+                    <input type="text" id="movieVideo" placeholder="URL video (.m3u8)">
+                    <label for="movieSubtitle">Link phụ đề (.vtt):</label>
+                    <input type="text" id="movieSubtitle" placeholder="URL phụ đề (.vtt)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="introStart">Giới thiệu bắt đầu (phút:giây):</label>
+                    <input type="text" id="introStart" placeholder="00:00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="introEnd">Giới thiệu kết thúc (phút:giây):</label>
+                    <input type="text" id="introEnd" placeholder="00:00">
+                </div>
+                
+                <div class="form-group">
+                    <button type="button" id="previewVideoBtn" class="btn btn-success">Xem trước video</button>
+                </div>
+                
+                <div id="previewContainer" class="preview-container" style="display: none;">
+                    <video id="previewVideo" class="preview-video" controls></video>
+                    <div class="preview-controls">
+                        <button type="button" id="playPreviewBtn" class="btn btn-primary">Phát</button>
+                        <button type="button" id="pausePreviewBtn" class="btn btn-danger">Tạm dừng</button>
+                    </div>
+                </div>
+                
+                < divider class="form-group">
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                    <button type="button" class="btn btn-danger" id="cancelBtn">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Biến lưu trữ dữ liệu phim và bộ lọc
+        let moviesData = [];
+        let customFilters = [];
+        let currentTab = 'all';
+        let hls = null;
+        
+        // DOM Elements
+        const movieGrid = document.getElementById('movieGrid');
+        const movieModal = document.getElementById('movieModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const movieForm = document.getElementById('movieForm');
+        const closeModalBtn = document.querySelector('.close');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const addMovieBtn = document.getElementById('addMovieBtn');
+        const copyJsonBtn = document.getElementById('copyJsonBtn');
+        const reloadDataBtn = document.getElementById('reloadDataBtn');
+        const checkLinksBtn = document.getElementById('checkLinksBtn');
+        const searchInput = document.getElementById('searchInput');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const filterCheckboxGroup = document.getElementById('filterCheckboxGroup');
+        const newFilterInput = document.getElementById('newFilterInput');
+        const addFilterBtn = document.getElementById('addFilterBtn');
+        const customFilterList = document.getElementById('customFilterList');
+        const thuyetMinhMoviesSelect = document.getElementById('thuyetMinhMovies');
+        const longTiengMoviesSelect = document.getElementById('longTiengMovies');
+        
+        // Form elements
+        const movieIdInput = document.getElementById('movieId');
+        const movieTitleInput = document.getElementById('movieTitle');
+        const movieImageInput = document.getElementById('movieImage');
+        const movieDescriptionInput = document.getElementById('movieDescription');
+        const movieTypeSelect = document.getElementById('movieType');
+        const movieFormatSelect = document.getElementById('movieFormat');
+        const episodesContainer = document.getElementById('episodesContainer');
+        const episodeList = document.getElementById('episodeList');
+        const addEpisodeBtn = document.getElementById('addEpisodeBtn');
+        const movieVideoInput = document.getElementById('movieVideo');
+        const movieSubtitleInput = document.getElementById('movieSubtitle');
+        const introStartInput = document.getElementById('introStart');
+        const introEndInput = document.getElementById('introEnd');
+        const previewVideoBtn = document.getElementById('previewVideoBtn');
+        const previewContainer = document.getElementById('previewContainer');
+        const videoPreview = document.getElementById('previewVideo');
+        const playPreviewBtn = document.getElementById('playPreviewBtn');
+        const pausePreviewBtn = document.getElementById('pausePreviewBtn');
+        
+        // Bộ lọc mặc định
+        const defaultFilters = [
+            'Phim Chiếu Rạp',
+            'Phim Hành Động',
+            'Phim Hoạt Hình',
+            'Phim Bộ',
+            'Phim Tình Cảm',
+            'Phim Tâm Lý',
+            'Phim Kinh Dị',
+            'Thuyết Minh',
+            'Lồng Tiếng'
+        ];
+        
+        // Hàm tạo ID duy nhất
+        function generateId() {
+            return 'movie_' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Sự kiện khi trang tải xong
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMovies();
+            setupEventListeners();
+        });
+        
+        // Thiết lập các sự kiện
+        function setupEventListeners() {
+            // Sự kiện modal
+            addMovieBtn.addEventListener('click', () => openModal());
+            closeModalBtn.addEventListener('click', () => closeModal());
+            cancelBtn.addEventListener('click', () => closeModal());
+            
+            // Sự kiện form
+            movieForm.addEventListener('submit', handleFormSubmit);
+            movieTypeSelect.addEventListener('change', toggleEpisodeFields);
+            addEpisodeBtn.addEventListener('click', addEpisodeField);
+            previewVideoBtn.addEventListener('click', previewVideo);
+            addFilterBtn.addEventListener('click', addCustomFilter);
+            
+            // Auto-detect video format for single movie
+            movieVideoInput.addEventListener('input', autoDetectVideoFormat);
+            
+            // Auto-detect video format for series episodes
+            episodeList.addEventListener('input', (e) => {
+                if (e.target.classList.contains('episode-video')) {
+                    autoDetectVideoFormat(e);
+                }
+            });
+            
+            // Sự kiện nút sao chép và tải lại
+            copyJsonBtn.addEventListener('click', copyMoviesToClipboard);
+            reloadDataBtn.addEventListener('click', loadMovies);
+            checkLinksBtn.addEventListener('click', checkAllLinks);
+            
+            // Sự kiện tìm kiếm và bộ lọc
+            searchInput.addEventListener('input', filterMovies);
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+            
+            // Sự kiện điều khiển video preview
+            playPreviewBtn.addEventListener('click', () => videoPreview.play());
+            pausePreviewBtn.addEventListener('click', () => videoPreview.pause());
+        }
+        
+        // Tự động phát hiện định dạng video
+        function autoDetectVideoFormat(event) {
+            const url = event.target.value.toLowerCase();
+            if (url.includes('m3u8')) {
+                movieFormatSelect.value = '.m3u8';
+            } else if (url.includes('iframe') || url.includes('embed') || url.includes('youtube.com') || url.includes('vimeo.com')) {
+                movieFormatSelect.value = 'iframe';
+            }
+        }
+        
+        // Tải dữ liệu phim từ file JSON
+        async function loadMovies() {
+            try {
+                const response = await fetch('phim.json');
+                if (!response.ok) throw new Error('Không thể tải file phim.json');
+                
+                moviesData = await response.json();
+                // Thêm ID và các trường mặc định nếu chưa có
+                moviesData.forEach(movie => {
+                    if (!movie.id) movie.id = generateId();
+                    if (!movie.moTa) movie.moTa = '';
+                    if (!movie.ThuyetMinh) movie.ThuyetMinh = [];
+                    if (!movie.LongTieng) movie.LongTieng = [];
+                    movie.tap.forEach(episode => {
+                        if (!episode.subtitle) episode.subtitle = '';
+                    });
+                    // Thu thập các bộ lọc tùy chỉnh từ dữ liệu phim
+                    movie.boloc.forEach(filter => {
+                        if (!defaultFilters.includes(filter) && !customFilters.includes(filter)) {
+                            customFilters.push(filter);
+                        }
+                    });
+                });
+                updateFilterCheckboxes();
+                updateMovieSelects();
+                displayMovies(moviesData);
+                console.log('Dữ liệu phim đã được tải:', moviesData);
+                console.log('Bộ lọc tùy chỉnh:', customFilters);
+            } catch (error) {
+                console.error('Lỗi khi tải dữ liệu phim:', error);
+                alert('Lỗi khi tải dữ liệu phim: ' + error.message);
+            }
+        }
+        
+        // Cập nhật checkbox bộ lọc
+        function updateFilterCheckboxes() {
+            // Xóa các checkbox cũ
+            filterCheckboxGroup.innerHTML = '';
+            
+            // Thêm checkbox cho bộ lọc mặc định
+            defaultFilters.forEach(filter => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" id="filter${filter.replace(/\s+/g, '')}" checked>
+                    <label for="filter${filter.replace(/\s+/g, '')}">${filter}</label>
+                `;
+                filterCheckboxGroup.appendChild(checkboxItem);
+                checkboxItem.querySelector('input').addEventListener('change', filterMovies);
+            });
+            
+            // Thêm checkbox cho bộ lọc tùy chỉnh
+            customFilters.forEach(filter => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" id="filter${filter.replace(/\s+/g, '')}" checked>
+                    <label for="filter${filter.replace(/\s+/g, '')}">${filter}</label>
+                `;
+                filterCheckboxGroup.appendChild(checkboxItem);
+                checkboxItem.querySelector('input').addEventListener('change', filterMovies);
+            });
+        }
+        
+        // Cập nhật dropdown chọn phim thuyết minh và lồng tiếng
+        function updateMovieSelects() {
+            thuyetMinhMoviesSelect.innerHTML = '<option value="">Không chọn</option>';
+            longTiengMoviesSelect.innerHTML = '<option value="">Không chọn</option>';
+            
+            moviesData.forEach(movie => {
+                const option1 = document.createElement('option');
+                option1.value = movie.id;
+                option1.textContent = movie.TieuDe;
+                thuyetMinhMoviesSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = movie.id;
+                option2.textContent = movie.TieuDe;
+                longTiengMoviesSelect.appendChild(option2);
+            });
+        }
+        
+        // Thêm bộ lọc tùy chỉnh
+        function addCustomFilter() {
+            const newFilter = newFilterInput.value.trim();
+            if (newFilter && !defaultFilters.includes(newFilter) && !customFilters.includes(newFilter)) {
+                customFilters.push(newFilter);
+                updateModalFilterCheckboxes();
+                newFilterInput.value = '';
+            } else if (!newFilter) {
+                alert('Vui lòng nhập tên bộ lọc!');
+            } else {
+                alert('Bộ lọc này đã tồn tại!');
+            }
+        }
+        
+        // Cập nhật checkbox bộ lọc trong modal
+        function updateModalFilterCheckboxes() {
+            const modalCheckboxGroup = document.querySelector('#movieForm .checkbox-group');
+            modalCheckboxGroup.innerHTML = '';
+            
+            // Thêm checkbox cho bộ lọc mặc định
+            defaultFilters.forEach(filter => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" id="filter${filter.replace(/\s+/g, '')}Input" value="${filter}">
+                    <label for="filter${filter.replace(/\s+/g, '')}Input">${filter}</label>
+                `;
+                modalCheckboxGroup.appendChild(checkboxItem);
+            });
+            
+            // Thêm checkbox cho bộ lọc tùy chỉnh
+            customFilters.forEach(filter => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" id="filter${filter.replace(/\s+/g, '')}Input" value="${filter}">
+                    <label for="filter${filter.replace(/\s+/g, '')}Input">${filter}</label>
+                `;
+                modalCheckboxGroup.appendChild(checkboxItem);
+            });
+            
+            // Hiển thị danh sách bộ lọc tùy chỉnh
+            customFilterList.innerHTML = customFilters.map(filter => `<div>${filter}</div>`).join('');
+        }
+        
+        // Hiển thị danh sách phim
+        function displayMovies(movies) {
+            movieGrid.innerHTML = '';
+            
+            // Sắp xếp phim mới nhất (cuối mảng) lên đầu
+            const sortedMovies = [...movies].reverse();
+            
+            sortedMovies.forEach((movie) => {
+                const movieCard = createMovieCard(movie);
+                movieGrid.appendChild(movieCard);
+            });
+        }
+        
+        // Tạo thẻ phim
+        function createMovieCard(movie) {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            
+            // Kiểm tra trạng thái link
+            const linkStatus = checkLinkStatus(movie);
+            const statusClass = linkStatus === 'working' ? 'status-working' : 
+                               linkStatus === 'error' ? 'status-error' : 'status-unknown';
+            
+            // Lấy tiêu đề phim liên quan đến thuyết minh và lồng tiếng
+            const thuyetMinhTitles = movie.ThuyetMinh.map(id => {
+                const relatedMovie = moviesData.find(m => m.id === id);
+                return relatedMovie ? relatedMovie.TieuDe : id;
+            }).join(', ');
+            const longTiengTitles = movie.LongTieng.map(id => {
+                const relatedMovie = moviesData.find(m => m.id === id);
+                return relatedMovie ? relatedMovie.TieuDe : id;
+            }).join(', ');
+            
+            // Tạo HTML cho thẻ phim
+            card.innerHTML = `
+                <img src="${movie.anh}" alt="${movie.TieuDe}" class="movie-poster" onerror="this.src='https://via.placeholder.com/300x450?text=Ảnh+Lỗi'">
+                <div class="movie-info">
+                    <div class="movie-title">${movie.TieuDe}</div>
+                    <div class="movie-meta">
+                        <div>Loại: ${movie.loai === 'movie' ? 'Phim lẻ' : 'Phim bộ'}</div>
+                        <div>Định dạng: ${movie.Dang}</div>
+                        <div>Bộ lọc: ${movie.boloc.join(', ')}</div>
+                        <div>Thuyết Minh: ${thuyetMinhTitles || 'Không có'}</div>
+                        <div>Lồng Tiếng: ${longTiengTitles || 'Không có'}</div>
+                        <div>Trạng thái: <span class="status-badge ${statusClass}">
+                            ${linkStatus === 'working' ? 'Hoạt động' : 
+                              linkStatus === 'error' ? 'Lỗi' : 'Không rõ'}
+                        </span></div>
+                    </div>
+                    <div class="movie-actions">
+                        <button class="btn btn-primary edit-btn" data-id="${movie.id}">Sửa</button>
+                        <button class="btn btn-danger delete-btn" data-id="${movie.id}">Xóa</button>
+                    </div>
+                </div>
+            `;
+            
+            // Thêm sự kiện cho nút sửa/xóa
+            card.querySelector('.edit-btn').addEventListener('click', () => openModal(movie.id));
+            card.querySelector('.delete-btn').addEventListener('click', () => deleteMovie(movie.id));
+            
+            return card;
+        }
+        
+        // Kiểm tra trạng thái link phim
+        function checkLinkStatus(movie) {
+            if (!movie.tap || movie.tap.length === 0) return 'error';
+            
+            for (const episode of movie.tap) {
+                if (!episode.video) return 'error';
+                
+                if (movie.Dang === 'iframe') {
+                    if (!episode.video.includes('http')) return 'error';
+                } else if (movie.Dang === '.m3u8') {
+                    if (!episode.video.includes('m3u8')) return 'error';
+                }
+                // Kiểm tra link phụ đề (nếu có)
+                if (episode.subtitle && !episode.subtitle.includes('.vtt')) return 'error';
+            }
+            
+            return 'working';
+        }
+        
+        // Mở modal để thêm/sửa phim
+        function openModal(movieId = null) {
+            updateModalFilterCheckboxes();
+            updateMovieSelects();
+            if (movieId !== null) {
+                // Chế độ sửa
+                modalTitle.textContent = 'Sửa Phim';
+                movieIdInput.value = movieId;
+                
+                const movie = moviesData.find(m => m.id === movieId);
+                if (!movie) {
+                    alert('Không tìm thấy phim!');
+                    return;
+                }
+                
+                movieTitleInput.value = movie.TieuDe || '';
+                movieImageInput.value = movie.anh || '';
+                movieDescriptionInput.value = movie.moTa || '';
+                movieTypeSelect.value = movie.loai || 'movie';
+                movieFormatSelect.value = movie.Dang || '.m3u8';
+                
+                // Đặt bộ lọc
+                const filterInputs = document.querySelectorAll('#movieForm .checkbox-group input');
+                filterInputs.forEach(input => {
+                    input.checked = movie.boloc.includes(input.value);
+                });
+                
+                // Đặt phim thuyết minh và lồng tiếng
+                Array.from(thuyetMinhMoviesSelect.options).forEach(option => {
+                    option.selected = movie.ThuyetMinh.includes(option.value);
+                });
+                Array.from(longTiengMoviesSelect.options).forEach(option => {
+                    option.selected = movie.LongTieng.includes(option.value);
+                });
+                
+                // Xóa các tập phim cũ
+                episodeList.innerHTML = '';
+                
+                if (movie.loai === 'series') {
+                    movie.tap.forEach((episode) => {
+                        addEpisodeField(episode.tapSo, episode.video, episode.GioiThieuBatDau, episode.GioiThieuKetThuc, episode.subtitle || '');
+                    });
+                } else {
+                    if (movie.tap && movie.tap.length > 0) {
+                        movieVideoInput.value = movie.tap[0].video || '';
+                        movieSubtitleInput.value = movie.tap[0].subtitle || '';
+                        introStartInput.value = movie.tap[0].GioiThieuBatDau || '';
+                        introEndInput.value = movie.tap[0].GioiThieuKetThuc || '';
+                    }
+                }
+                
+                toggleEpisodeFields();
+            } else {
+                // Chế độ thêm mới
+                modalTitle.textContent = 'Thêm Phim Mới';
+                movieIdInput.value = '';
+                movieForm.reset();
+                movieDescriptionInput.value = '';
+                movieSubtitleInput.value = '';
+                episodeList.innerHTML = '';
+                thuyetMinhMoviesSelect.selectedIndex = -1;
+                longTiengMoviesSelect.selectedIndex = -1;
+                toggleEpisodeFields();
+            }
+            
+            previewContainer.style.display = 'none';
+            videoPreview.src = '';
+            movieModal.style.display = 'block';
+        }
+        
+        // Đóng modal
+        function closeModal() {
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+            videoPreview.src = '';
+            previewContainer.style.display = 'none';
+            movieModal.style.display = 'none';
+        }
+        
+        // Chuyển đổi hiển thị trường tập phim dựa trên loại phim
+        function toggleEpisodeFields() {
+            if (movieTypeSelect.value === 'series') {
+                episodesContainer.style.display = 'block';
+                document.getElementById('singleEpisodeContainer').style.display = 'none';
+                previewVideoBtn.style.display = 'none';
+            } else {
+                episodesContainer.style.display = 'none';
+                document.getElementById('singleEpisodeContainer').style.display = 'block';
+                previewVideoBtn.style.display = 'block';
+            }
+        }
+        
+        // Thêm trường tập phim
+        function addEpisodeField(episodeNumber = '', videoUrl = '', introStart = '', introEnd = '', subtitle = '') {
+            const episodeItem = document.createElement('div');
+            episodeItem.className = 'episode-item';
+            
+            episodeItem.innerHTML = `
+                <div class="episode-inputs">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label>Số tập:</label>
+                            <input type="number" class="episode-number" value="${episodeNumber}" placeholder="Số tập" required>
+                        </div>
+                        <div style="flex: 3;">
+                            <label>Link video:</label>
+                            <input type="text" class="episode-video" value="${videoUrl}" placeholder="URL video (.m3u8)" required>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <div style="flex: 1;">
+                            <label>Link phụ đề (.vtt):</label>
+                            <input type="text" class="episode-subtitle" value="${subtitle}" placeholder="URL phụ đề (.vtt)">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <div style="flex: 1;">
+                            <label>Giới thiệu bắt đầu:</label>
+                            <input type="text" class="episode-intro-start" value="${introStart}" placeholder="00:00">
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Giới thiệu kết thúc:</label>
+                            <input type="text" class="episode-intro-end" value="${introEnd}" placeholder="00:00">
+                        </div>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <button type="button" class="btn btn-success preview-episode-btn">Xem trước</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-danger remove-episode-btn">Xóa</button>
+            `;
+            
+            episodeItem.querySelector('.remove-episode-btn').addEventListener('click', () => {
+                episodeList.removeChild(episodeItem);
+            });
+            
+            episodeItem.querySelector('.preview-episode-btn').addEventListener('click', () => {
+                const videoUrl = episodeItem.querySelector('.episode-video').value;
+                const subtitleUrl = episodeItem.querySelector('.episode-subtitle').value;
+                previewVideoContent(videoUrl, subtitleUrl);
+            });
+            
+            episodeList.appendChild(episodeItem);
+        }
+        
+        // Xem trước video
+        function previewVideoContent(videoUrl, subtitleUrl) {
+            if (!videoUrl || !videoUrl.includes('m3u8')) {
+                alert('Vui lòng nhập URL video .m3u8 hợp lệ để xem trước.');
+                return;
+            }
+            
+            previewContainer.style.display = 'block';
+            videoPreview.innerHTML = '';
+            
+            if (subtitleUrl) {
+                const track = document.createElement('track');
+                track.kind = 'subtitles';
+                track.src = subtitleUrl;
+                track.srclang = 'vi';
+                track.label = 'Tiếng Việt';
+                track.default = true;
+                videoPreview.appendChild(track);
+            }
+            
+            if (Hls.isSupported()) {
+                if (hls) hls.destroy();
+                hls = new Hls();
+                hls.loadSource(videoUrl);
+                hls.attachMedia(videoPreview);
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS Error:', data);
+                    alert('Lỗi khi tải video: ' + data.type);
+                });
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    videoPreview.play().catch(e => console.error('Lỗi phát video:', e));
+                });
+            } else if (videoPreview.canPlayType('application/vnd.apple.mpegurl')) {
+                videoPreview.src = videoUrl;
+                videoPreview.addEventListener('loadedmetadata', () => {
+                    videoPreview.play().catch(e => console.error('Lỗi phát video:', e));
+                });
+            } else {
+                alert('Trình duyệt không hỗ trợ HLS.');
+            }
+        }
+        
+        // Xử lý nút xem trước video (cho phim lẻ)
+        function previewVideo() {
+            const videoUrl = movieVideoInput.value;
+            const subtitleUrl = movieSubtitleInput.value;
+            previewVideoContent(videoUrl, subtitleUrl);
+        }
+        
+        // Xử lý khi submit form
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const movieData = {
+                id: movieIdInput.value || generateId(),
+                TieuDe: movieTitleInput.value,
+                anh: movieImageInput.value,
+                moTa: movieDescriptionInput.value,
+                loai: movieTypeSelect.value,
+                Dang: movieFormatSelect.value,
+                boloc: [],
+                ThuyetMinh: [],
+                LongTieng: [],
+                tap: []
+            };
+            
+            // Thêm bộ lọc
+            const filterInputs = document.querySelectorAll('#movieForm .checkbox-group input');
+            filterInputs.forEach(input => {
+                if (input.checked) {
+                    movieData.boloc.push(input.value);
+                }
+            });
+            
+            // Thêm phim thuyết minh và lồng tiếng
+            Array.from(thuyetMinhMoviesSelect.selectedOptions).forEach(option => {
+                if (option.value) movieData.ThuyetMinh.push(option.value);
+            });
+            Array.from(longTiengMoviesSelect.selectedOptions).forEach(option => {
+                if (option.value) movieData.LongTieng.push(option.value);
+            });
+            
+            // Thêm tập phim
+            if (movieData.loai === 'series') {
+                const episodeItems = episodeList.querySelectorAll('.episode-item');
+                
+                episodeItems.forEach(item => {
+                    const episodeNumber = item.querySelector('.episode-number').value;
+                    const videoUrl = item.querySelector('.episode-video').value;
+                    const subtitleUrl = item.querySelector('.episode-subtitle').value;
+                    const introStart = item.querySelector('.episode-intro-start').value;
+                    const introEnd = item.querySelector('.episode-intro-end').value;
+                    
+                    movieData.tap.push({
+                        tapSo: parseInt(episodeNumber),
+                        video: videoUrl,
+                        subtitle: subtitleUrl || '',
+                        GioiThieuBatDau: introStart,
+                        GioiThieuKetThuc: introEnd
+                    });
+                });
+                
+                movieData.tap.sort((a, b) => a.tapSo - b.tapSo);
+            } else {
+                movieData.tap.push({
+                    tapSo: null,
+                    video: movieVideoInput.value,
+                    subtitle: movieSubtitleInput.value || '',
+                    GioiThieuBatDau: introStartInput.value,
+                    GioiThieuKetThuc: introEndInput.value
+                });
+            }
+            
+            // Thêm hoặc cập nhật phim
+            const movieId = movieIdInput.value;
+            if (movieId === '') {
+                moviesData.push(movieData); // Thêm vào cuối mảng
+            } else {
+                const index = moviesData.findIndex(m => m.id === movieId);
+                if (index !== -1) {
+                    moviesData[index] = movieData;
+                }
+            }
+            
+            // Cập nhật danh sách bộ lọc tùy chỉnh
+            movieData.boloc.forEach(filter => {
+                if (!defaultFilters.includes(filter) && !customFilters.includes(filter)) {
+                    customFilters.push(filter);
+                }
+            });
+            
+            updateFilterCheckboxes();
+            updateMovieSelects();
+            displayMovies(moviesData);
+            closeModal();
+        }
+        
+        // Xóa phim
+        function deleteMovie(movieId) {
+            if (confirm('Bạn có chắc chắn muốn xóa phim này?')) {
+                moviesData = moviesData.filter(m => m.id !== movieId);
+                updateMovieSelects();
+                displayMovies(moviesData);
+            }
+        }
+        
+        // Sao chép dữ liệu phim vào clipboard
+        function copyMoviesToClipboard() {
+            const dataStr = JSON.stringify(moviesData, null, 2);
+            navigator.clipboard.writeText(dataStr)
+                .then(() => {
+                    alert('Dữ liệu JSON đã được sao chép vào clipboard!');
+                })
+                .catch(err => {
+                    console.error('Lỗi khi sao chép JSON:', err);
+                    alert('Lỗi khi sao chép JSON: ' + err.message);
+                });
+        }
+        
+        // Kiểm tra tất cả các link phim
+        async function checkAllLinks() {
+            alert('Chức năng kiểm tra link sẽ thực hiện kiểm tra từng link phim.\nLưu ý: Đây chỉ là kiểm tra cơ bản, không đảm bảo 100% link hoạt động.');
+            
+            moviesData.forEach(movie => {
+                const status = checkLinkStatus(movie);
+            });
+            
+            displayMovies(moviesData);
+        }
+        
+        // Lọc phim theo từ khóa và bộ lọc
+        function filterMovies() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filterInputs = document.querySelectorAll('#filterCheckboxGroup input');
+            const activeFilters = Array.from(filterInputs)
+                .filter(input => input.checked)
+                .map(input => input.nextElementSibling.textContent);
+            
+            const filteredMovies = moviesData.filter(movie => {
+                if (currentTab === 'movies' && movie.loai !== 'movie') return false;
+                if (currentTab === 'series' && movie.loai !== 'series') return false;
+                if (currentTab === 'issues' && checkLinkStatus(movie) !== 'error') return false;
+                
+                if (searchTerm && !movie.TieuDe.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+                
+                // Kiểm tra bộ lọc
+                if (activeFilters.length > 0 && !activeFilters.some(filter => movie.boloc.includes(filter))) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            displayMovies(filteredMovies);
+        }
+        
+        // Chuyển tab
+        function switchTab(tab) {
+            currentTab = tab;
+            tabButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            filterMovies();
+        }
+    </script>
+</body>
+</html>

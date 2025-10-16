@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoInPhIm | Xem Phim</title>
+    <link rel="icon" type="image/png" href="img/image2-fotor-20250813113121.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.ably.io/lib/ably.min-1.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0a0a0a',
+                            800: '#121212',
+                            700: '#1a1a1a',
+                            600: '#222222',
+                            500: '#2a2a2a',
+                        },
+                        netflix: {
+                            red: '#e50914',
+                        },
+                        glass: {
+                            bg: 'rgba(18, 18, 18, 0.7)',
+                            border: 'rgba(255, 255, 255, 0.1)',
+                        }
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                        sm: '4px',
+                        md: '8px',
+                        lg: '12px',
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: linear-gradient(145deg, rgba(18, 18, 18, 0.9), rgba(40, 40, 40, 0.8));
+            border-radius: 1rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.05);
+            animation: liquidGlass 0.8s ease forwards;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .video-container.ambient {
+            padding-bottom: 60%;
+            box-shadow: none;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+            z-index: 1;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1rem;
+            pointer-events: none;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-overlay.active {
+            opacity: 1;
+        }
+
+        .video-overlay > * {
+            pointer-events: auto;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .ambient-btn, .skip-intro-btn, .next-episode-btn, .subtitle-toggle, .thuyet-minh-btn, .long-tieng-btn, .favorite-btn {
+            background: linear-gradient(145deg, rgba(229, 9, 20, 0.8), rgba(229, 9, 20, 0.6));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .ambient-btn:hover, .skip-intro-btn:hover, .next-episode-btn:hover, .subtitle-toggle:hover, .thuyet-minh-btn:hover, .long-tieng-btn:hover, .favorite-btn:hover {
+            background: linear-gradient(145deg, rgba(229, 9, 20, 1), rgba(200, 8, 18, 1));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+        }
+
+        .subtitle-toggle.active, .favorite-btn.active {
+            background: linear-gradient(145deg, rgba(229, 9, 20, 1), rgba(200, 8, 18, 1));
+            border-color: rgba(229, 9, 20, 0.5);
+        }
+
+        .episode-list {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(18, 18, 18, 0.7);
+            border-radius: 1rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .episode-btn {
+            background: linear-gradient(145deg, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.8));
+            color: #e5e5e5;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .episode-btn:hover {
+            background: linear-gradient(145deg, rgba(60, 60, 60, 0.9), rgba(50, 50, 50, 0.8));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .episode-btn.active {
+            background: linear-gradient(145deg, rgba(229, 9, 20, 1), rgba(200, 8, 18, 1));
+            color: white;
+            border-color: rgba(229, 9, 20, 0.5);
+        }
+
+        .filter-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(145deg, rgba(18, 18, 18, 0.7), rgba(30, 30, 30, 0.6));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-container.scrolled {
+            background: linear-gradient(145deg, rgba(18, 18, 18, 0.9), rgba(30, 30, 30, 0.8));
+        }
+
+        .filter-btn {
+            background: linear-gradient(145deg, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.8));
+            color: #e5e5e5;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .filter-container.scrolled .filter-btn {
+            background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(40, 40, 40, 0.8));
+        }
+
+        .filter-btn:hover {
+            background: linear-gradient(145deg, rgba(60, 60, 60, 0.9), rgba(50, 50, 50, 0.8));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(145deg, rgba(229, 9, 20, 1), rgba(200, 8, 18, 1));
+            color: white;
+            border-color: rgba(229, 9, 20, 0.5);
+        }
+
+        .category-btn {
+            background: linear-gradient(145deg, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.8));
+            color: #e5e5e5;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .category-btn:hover {
+            background: linear-gradient(145deg, rgba(60, 60, 60, 0.9), rgba(50, 50, 50, 0.8));
+            transform: translateY(-2px);
+        }
+
+        .search-input {
+            background: linear-gradient(145deg, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.8));
+            color: #e5e5e5;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.5rem 1rem;
+            width: 100%;
+            max-width: 300px;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .filter-container.scrolled .search-input {
+            background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(40, 40, 40, 0.8));
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(229, 9, 20, 0.5);
+            box-shadow: 0 0 8px rgba(229, 9, 20, 0.3);
+        }
+
+        .chat-container {
+            background: linear-gradient(145deg, rgba(18, 18, 18, 0.7), rgba(30, 30, 30, 0.6));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .chat-header {
+            padding: 0.75rem;
+            background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.8));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .chat-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+            text-align: center;
+        }
+
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            padding: 0.5rem 0.75rem;
+            background: linear-gradient(145deg, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.8));
+            border-radius: 0.75rem;
+            max-width: 80%;
+            word-wrap: break-word;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .message.self {
+            align-self: flex-end;
+            background: linear-gradient(145deg, rgba(229, 9, 20, 1), rgba(200, 8, 18, 1));
+            color: white;
+        }
+
+        .username {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #e5e5e5;
+            margin-bottom: 0.2rem;
+        }
+
+        .message.self .username {
+            color: #fff;
+        }
+
+        .message-text {
+            font-size: 0.9rem;
+            color: #e5e5e5;
+        }
+
+        .message.self .message-text {
+            color: #fff;
+        }
+
+        .chat-input-container {
+            padding: 0.75rem;
+            background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(20, 20, 20, 0.8));
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            border-radius: 0 0 1rem 1rem;
+        }
+
+        .chat-username, .chat-input {
+            background: linear-gradient(145deg, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.8));
+            color: #e5e5e5;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .chat-username {
+            width: 80px;
+        }
+
+        .chat-input {
+            flex: 1;
+        }
+
+        .chat-username:focus, .chat-input:focus {
+            border-color: rgba(229, 9, 20, 0.5);
+            box-shadow: 0 0 8px rgba(229, 9, 20, 0.3);
+        }
+
+        .chat-send-btn {
+            background: linear-gradient(145deg, rgba(229, 9, 20, 1), rgba(200, 8, 18, 1));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .chat-send-btn:hover {
+            background: linear-gradient(145deg, rgba(200, 8, 18, 1), rgba(180, 7, 16, 1));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: linear-gradient(145deg, rgba(18, 18, 18, 0.7), rgba(30, 30, 30, 0.6));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            padding: 0.75rem;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-around;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: #e5e5e5;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.75rem;
+            min-width: 60px;
+            gap: 0.25rem;
+        }
+
+        .bottom-nav-btn:hover,
+        .bottom-nav-btn.active {
+            background: linear-gradient(145deg, rgba(229, 9, 20, 0.3), rgba(200, 8, 18, 0.3));
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        @keyframes liquidGlass {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0.5rem;
+                padding-bottom: 80px;
+            }
+
+            .video-container {
+                padding-bottom: 75%;
+                border-radius: 0.75rem;
+            }
+
+            .video-container.ambient {
+                padding-bottom: 80%;
+            }
+
+            .ambient-btn, .skip-intro-btn, .next-episode-btn, .subtitle-toggle, .thuyet-minh-btn, .long-tieng-btn, .favorite-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+                min-width: 60px;
+            }
+
+            .filter-btn, .category-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .search-input {
+                max-width: 100%;
+            }
+
+            .filter-container {
+                gap: 0.5rem;
+                justify-content: center;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .filter-container::-webkit-scrollbar {
+                display: none;
+            }
+
+            .chat-container {
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
+            }
+        }
+
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .chat-container {
+                margin-left: 1rem;
+                margin-right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans bg-dark-900 text-gray-200">
+    <div class="container mx-auto">
+        <header class="mb-4" id="site-header">
+        
+        </header>
+
+        <div class="filter-container flex flex-wrap gap-2 justify-center sm:justify-start" id="filter-controls">
+            <input id="search-input" class="search-input" placeholder="Tìm kiếm phim...">
+            <button class="filter-btn" data-filter="all">Trang chủ</button>
+            <a href="https://discord.gg/uqNA78fs9G" target="_blank" class="filter-btn bg-purple-600 hover:bg-purple-700 text-white">Discord</a>
+        </div>
+
+        <div id="main-video-section" class="w-full mt-6">
+            <div class="video-container">
+                <div id="video-player"></div>
+                <div class="video-overlay">
+                    <div class="control-buttons">
+                        <button id="skip-intro-btn" class="skip-intro-btn hidden">Bỏ qua phần giới thiệu</button>
+                        <button id="next-episode-btn" class="next-episode-btn hidden">Tập tiếp theo <span id="countdown"></span></button>
+                    </div>
+                </div>
+            </div>
+            <div class="control-buttons mt-2" id="video-controls">
+                <button id="ambient-btn" class="ambient-btn">Chế độ điện ảnh</button>
+                <button id="subtitle-toggle" class="subtitle-toggle hidden">Tắt phụ đề</button>
+                <button id="thuyet-minh-btn" class="thuyet-minh-btn hidden">Phát Thuyết Minh</button>
+                <button id="long-tieng-btn" class="thuyet-minh-btn hidden">Phát Lồng Tiếng</button>
+                <button id="favorite-btn" class="favorite-btn">Thêm vào Yêu Thích</button>
+            </div>
+            <h2 id="main-video-title" class="text-xl font-semibold text-white mt-4 tracking-tight"></h2>
+            <div id="category-list" class="flex flex-wrap gap-2 mt-2"></div>
+            <div id="episode-list" class="episode-list hidden"></div>
+        </div>
+
+        <div id="community-chat" class="mt-4">
+            <div id="chat-container" class="chat-container">
+                <div class="chat-header">
+                    <h3>Chat cộng đồng</h3>
+                </div>
+                <div id="chat-box" class="chat-box"></div>
+                <div class="chat-input-container">
+                    <input type="text" id="chat-username" class="chat-username" placeholder="Tên..." value="Anonymous">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="Nhập tin nhắn...">
+                    <button id="chat-send-btn" class="chat-send-btn">Gửi</button>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <script>
+        // Filter scroll effect
+        const filterContainer = document.querySelector('.filter-container');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                filterContainer.classList.add('scrolled');
+            } else {
+                filterContainer.classList.remove('scrolled');
+            }
+        });
+
+        let videos = [];
+        let currentVideoData = null;
+        let hls = null;
+        let colorUpdateInterval = null;
+
+        // Cookie handling functions
+        function setCookie(name, value, seconds) {
+            const date = new Date();
+            date.setTime(date.getTime() + (seconds * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + encodeURIComponent(value) + ";" + expires + ";path=/;SameSite=Strict";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
+                if (cookie.indexOf(nameEQ) === 0) {
+                    return decodeURIComponent(cookie.substring(nameEQ.length, cookie.length));
+                }
+            }
+            return null;
+        }
+
+        // Favorite handling functions
+        function getFavorites() {
+            const favorites = getCookie("favorites");
+            return favorites ? JSON.parse(favorites) : [];
+        }
+
+        function saveFavorite(videoData, title) {
+            const favorites = getFavorites();
+            const videoId = cleanVideoUrl(videoData.tap[currentVideoData.episodeIndex].video);
+            const thumbnail = videoData.anh || 'img/placeholder.jpg';
+            const categories = Array.isArray(videoData.boloc) ? videoData.boloc.join(", ") : 'Không có thể loại';
+            const isAlreadyFavorite = favorites.some(fav => fav.videoId === videoId);
+
+            if (isAlreadyFavorite) {
+                alert('Phim này đã có trong danh sách yêu thích!');
+                return false;
+            }
+
+            favorites.push({
+                videoId,
+                title,
+                thumbnail,
+                categories
+            });
+
+            setCookie("favorites", JSON.stringify(favorites), 30 * 24 * 60 * 60);
+            document.getElementById('favorite-btn').classList.add('active');
+            document.getElementById('favorite-btn').textContent = 'Đã thêm vào Yêu Thích';
+            alert('Đã thêm phim vào danh sách yêu thích!');
+            return true;
+        }
+
+        function isFavorite(videoId) {
+            const favorites = getFavorites();
+            return favorites.some(fav => fav.videoId === videoId);
+        }
+
+        // Save and get current watching video in cookie
+        function saveCurrentWatchingVideo(videoId, title, progress = 0) {
+            const currentWatching = {
+                videoId,
+                title,
+                progress
+            };
+            console.log('Lưu cookie currentWatchingVideo:', currentWatching);
+            setCookie("currentWatchingVideo", JSON.stringify(currentWatching), 7 * 24 * 60 * 60);
+        }
+
+        function getCurrentWatchingVideo() {
+            const currentWatching = getCookie("currentWatchingVideo");
+            try {
+                return currentWatching ? JSON.parse(currentWatching) : null;
+            } catch (e) {
+                console.error("Lỗi khi phân tích cookie currentWatchingVideo:", e);
+                return null;
+            }
+        }
+
+        // Chat functionality
+        const ABLY_KEY = "BDzatA.Frs1jw:_RWjZtJGW0rzDHS6UdJuhfrJbEka-ZdAeYNzp7T2Zlc";
+        const ably = new Ably.Realtime({ key: ABLY_KEY, clientId: `client-${Math.random().toString(36).substr(2, 9)}` });
+        const channel = ably.channels.get("ephemeral-chat");
+        const chatBox = document.getElementById("chat-box");
+
+        function loadChatHistory() {
+            const chatHistory = getCookie("chatHistory");
+            if (chatHistory) {
+                try {
+                    const messages = JSON.parse(chatHistory);
+                    messages.forEach(msg => {
+                        const el = document.createElement("div");
+                        el.className = `message ${msg.clientId === ably.clientId ? 'self' : ''}`;
+                        el.innerHTML = `
+                            <span class="username">${msg.username}</span>
+                            <span class="message-text">${msg.data.text}</span>
+                        `;
+                        chatBox.appendChild(el);
+                    });
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                } catch (e) {
+                    console.error("Lỗi khi khôi phục lịch sử chat từ cookie:", e);
+                }
+            }
+        }
+
+        function saveChatMessage(clientId, username, text) {
+            let chatHistory = getCookie("chatHistory");
+            let messages = [];
+            if (chatHistory) {
+                try {
+                    messages = JSON.parse(chatHistory);
+                    if (!Array.isArray(messages)) {
+                        messages = [];
+                    }
+                } catch (e) {
+                    console.error("Lỗi khi phân tích lịch sử chat từ cookie:", e);
+                    messages = [];
+                }
+            }
+            messages.push({ clientId, username, text });
+            if (messages.length > 100) {
+                messages = messages.slice(-100);
+            }
+            setCookie("chatHistory", JSON.stringify(messages), 10800);
+        }
+
+        channel.subscribe("message", (msg) => {
+            const el = document.createElement("div");
+            el.className = `message ${msg.clientId === ably.clientId ? 'self' : ''}`;
+            el.innerHTML = `
+                <span class="username">${msg.data.username}</span>
+                <span class="message-text">${msg.data.text}</span>
+            `;
+            chatBox.appendChild(el);
+            saveChatMessage(msg.clientId, msg.data.username, msg.data.text);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        document.getElementById("chat-send-btn").onclick = () => {
+            const text = document.getElementById("chat-input").value.trim();
+            const username = document.getElementById("chat-username").value.trim() || "Anonymous";
+            if (text) {
+                channel.publish("message", { username, text });
+                document.getElementById("chat-input").value = "";
+            }
+        };
+
+        document.getElementById("chat-input").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                document.getElementById("chat-send-btn").click();
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", loadChatHistory);
+
+        function parseTimeToSeconds(timeStr) {
+            if (!timeStr || typeof timeStr !== 'string') return 0;
+            const [minutes, seconds] = timeStr.split(':').map(Number);
+            return (minutes || 0) * 60 + (seconds || 0);
+        }
+
+        function cleanVideoUrl(url) {
+            if (!url) return '';
+            try {
+                const urlObj = new URL(url);
+                const trackingParams = [
+                    'utm_source', 'utm_medium', 'utm_campaign',
+                    'utm_term', 'utm_content', 'fbclid',
+                    'gclid', 'yclid', 'msclkid'
+                ];
+                trackingParams.forEach(param => urlObj.searchParams.delete(param));
+                return urlObj.toString();
+            } catch (e) {
+                console.error('Lỗi làm sạch URL video:', e);
+                return url;
+            }
+        }
+
+        function isAdUrl(url) {
+            if (!url) return false;
+            const adKeywords = [
+                'ads', 'advert', 'promo', 'sponsor', 'banner', 'popup', 'click', 'offer',
+                'doubleclick', 'adservice', 'affiliate', 'tracking', 'marketing', 'adnetwork',
+                'campaign', 'analytics', 'pixel', 'redirect', 'clk', 'adclick', 'adserver'
+            ];
+            const adDomains = [
+                'adsense.google.com', 'doubleclick.net', 'googleadservices.com',
+                'googlesyndication.com', 'advertising.com', 'adfox.ru', 'adform.net',
+                'adriver.ru', 'adroll.com', 'taboola.com', 'outbrain.com', 'criteo.com',
+                'pubmatic.com', 'rubiconproject.com', 'openx.com'
+            ];
+            try {
+                const urlObj = new URL(url.toLowerCase());
+                const hostname = urlObj.hostname;
+                const path = urlObj.pathname;
+                const query = urlObj.search;
+                if (adDomains.some(domain => hostname.includes(domain))) return true;
+                if (adKeywords.some(keyword => hostname.includes(keyword) || path.includes(keyword) || query.includes(keyword))) return true;
+                const adPatterns = [
+                    /\/(ad|ads|advert|banner|pop|clk|redirect)\//i,
+                    /\.(ads|ad|banner|pop)\./i,
+                    /[?&](utm_|ad_|clk_|aff_)/i
+                ];
+                if (adPatterns.some(pattern => pattern.test(url))) return true;
+                return false;
+            } catch (e) {
+                console.error('Lỗi kiểm tra URL quảng cáo:', e);
+                return false;
+            }
+        }
+
+        function saveVideoProgress(videoId, time) {
+            const currentWatching = getCurrentWatchingVideo();
+            if (currentWatching && currentWatching.videoId === videoId) {
+                currentWatching.progress = Math.floor(time);
+                console.log('Lưu tiến độ video:', currentWatching);
+                setCookie("currentWatchingVideo", JSON.stringify(currentWatching), 7 * 24 * 60 * 60);
+            } else {
+                console.log('Không lưu tiến độ: videoId không khớp hoặc cookie không tồn tại:', { videoId, currentWatching });
+            }
+        }
+
+        function clearVideoProgress(videoId) {
+            const currentWatching = getCurrentWatchingVideo();
+            if (currentWatching && currentWatching.videoId === videoId) {
+                currentWatching.progress = 0;
+                console.log('Xóa tiến độ video:', currentWatching);
+                setCookie("currentWatchingVideo", JSON.stringify(currentWatching), 7 * 24 * 60 * 60);
+            }
+        }
+
+        function setupProgressTracking(videoElement, videoId) {
+            videoElement.addEventListener('timeupdate', () => {
+                const currentTime = videoElement.currentTime;
+                if (currentTime > 0) {
+                    console.log('Sự kiện timeupdate, thời gian hiện tại:', currentTime);
+                    saveVideoProgress(videoId, currentTime);
+                }
+            });
+
+            videoElement.addEventListener('ended', () => {
+                console.log('Video kết thúc, xóa tiến độ:', videoId);
+                clearVideoProgress(videoId);
+            });
+        }
+
+        function playVideo(videoData, title, seriesId, episodeIndex = 0) {
+            const episodeData = videoData.tap && videoData.tap[episodeIndex] ? videoData.tap[episodeIndex] : videoData.tap[0];
+            const cleanUrl = cleanVideoUrl(episodeData.video);
+            const videoId = cleanUrl;
+            const videoContainer = document.getElementById("video-player");
+            videoContainer.innerHTML = '';
+
+            if (isAdUrl(cleanUrl)) {
+                console.log("Đã chặn URL quảng cáo:", cleanUrl);
+                return;
+            }
+
+            try {
+                new URL(cleanUrl);
+            } catch (e) {
+                console.error('URL video không hợp lệ:', cleanUrl);
+                return;
+            }
+
+            if (currentVideoData && currentVideoData.videoId !== videoId) {
+                clearVideoProgress(currentVideoData.videoId);
+            }
+
+            currentVideoData = {
+                videoId,
+                introStart: episodeData.GioiThieuBatDau,
+                introEnd: episodeData.GioiThieuKetThuc,
+                url: cleanUrl,
+                episodes: videoData.tap,
+                episodeIndex,
+                format: videoData.Dang,
+                seriesId,
+                subtitle: episodeData.subtitle || null,
+                audioType: episodeData.audioType || 'dubbed'
+            };
+
+            saveCurrentWatchingVideo(videoId, title, 0);
+
+            const video = document.createElement('video');
+            video.id = 'main-video';
+            video.controls = true;
+            video.autoplay = true;
+            video.setAttribute('crossorigin', 'anonymous');
+            video.style.width = '100%';
+            video.style.height = '100%';
+            video.setAttribute('playsinline', '');
+            videoContainer.appendChild(video);
+
+            if (currentVideoData.subtitle) {
+                const track = document.createElement('track');
+                track.id = 'vtt-track';
+                track.kind = 'subtitles';
+                track.src = currentVideoData.subtitle;
+                track.srclang = 'vi';
+                track.label = 'Tiếng Việt';
+                track.default = true;
+                video.appendChild(track);
+
+                track.addEventListener('error', () => {
+                    console.error('Lỗi tải file phụ đề:', currentVideoData.subtitle);
+                });
+
+                video.addEventListener('loadedmetadata', () => {
+                    setTimeout(() => {
+                        if (video.textTracks[0]) {
+                            video.textTracks[0].mode = 'showing';
+                        }
+                        const subtitleToggle = document.getElementById('subtitle-toggle');
+                        subtitleToggle.classList.remove('hidden');
+                        subtitleToggle.classList.add('active');
+                        subtitleToggle.textContent = 'Tắt phụ đề';
+                    }, 200);
+                });
+            }
+
+            const thuyetMinhBtn = document.getElementById('thuyet-minh-btn');
+            const longTiengBtn = document.getElementById('long-tieng-btn');
+            const favoriteBtn = document.getElementById('favorite-btn');
+            thuyetMinhBtn.classList.add('hidden');
+            longTiengBtn.classList.add('hidden');
+
+            if (videoData.ThuyetMinh && videoData.ThuyetMinh.length > 0) {
+                thuyetMinhBtn.classList.remove('hidden');
+                thuyetMinhBtn.onclick = () => {
+                    const thuyetMinhVideo = videos.find(v => v.id === videoData.ThuyetMinh[0]);
+                    if (thuyetMinhVideo) {
+                        const thuyetMinhVideoId = cleanVideoUrl(thuyetMinhVideo.tap[0]?.video);
+                        const thuyetMinhTitle = videoData.TieuDe || 'Video không có tiêu đề';
+                        window.location.href = `watch.html?id=${encodeURIComponent(thuyetMinhVideoId)}&title=${encodeURIComponent(thuyetMinhTitle)}`;
+                    }
+                };
+            }
+
+            if (videoData.LongTieng && videoData.LongTieng.length > 0) {
+                longTiengBtn.classList.remove('hidden');
+                longTiengBtn.onclick = () => {
+                    const longTiengVideo = videos.find(v => v.id === videoData.LongTieng[0]);
+                    if (longTiengVideo) {
+                        const longTiengVideoId = cleanVideoUrl(longTiengVideo.tap[0]?.video);
+                        const longTiengTitle = videoData.TieuDe || 'Video không có tiêu đề';
+                        window.location.href = `watch.html?id=${encodeURIComponent(longTiengVideoId)}&title=${encodeURIComponent(longTiengTitle)}`;
+                    }
+                };
+            }
+
+            if (isFavorite(videoId)) {
+                favoriteBtn.classList.add('active');
+                favoriteBtn.textContent = 'Đã thêm vào Yêu Thích';
+            } else {
+                favoriteBtn.classList.remove('active');
+                favoriteBtn.textContent = 'Thêm vào Yêu Thích';
+            }
+
+            favoriteBtn.onclick = () => {
+                saveFavorite(videoData, title);
+            };
+
+            let initialSeekDone = false;
+            const seekToProgress = () => {
+                if (!initialSeekDone) {
+                    const currentWatching = getCurrentWatchingVideo();
+                    console.log('Kiểm tra tua video:', { currentWatching, currentVideoId: videoId });
+                    if (currentWatching && currentWatching.videoId === videoId && Number.isFinite(currentWatching.progress)) {
+                        console.log(`Tua video đến thời gian: ${currentWatching.progress}s`);
+                        video.currentTime = currentWatching.progress;
+                        initialSeekDone = true;
+                    } else {
+                        console.log('Không tua video:', { currentWatching, currentVideoId: videoId });
+                    }
+                }
+            };
+
+            if (Hls.isSupported() && currentVideoData.format === '.m3u8') {
+                if (hls) hls.destroy();
+                hls = new Hls();
+                hls.loadSource(cleanUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS Error:', data);
+                });
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    console.log('HLS manifest tải xong, thử tua video');
+                    video.play().catch(e => console.error('Lỗi phát video:', e));
+                    seekToProgress();
+                });
+                video.addEventListener('canplay', () => {
+                    console.log('Sự kiện canplay, thử tua video');
+                    seekToProgress();
+                });
+                video.addEventListener('canplaythrough', () => {
+                    console.log('Sự kiện canplaythrough, thử tua video');
+                    seekToProgress();
+                });
+                video.addEventListener('loadedmetadata', () => {
+                    console.log('Sự kiện loadedmetadata, thử tua video');
+                    seekToProgress();
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl') && currentVideoData.format === '.m3u8') {
+                video.src = cleanUrl;
+                video.addEventListener('loadeddata', () => {
+                    console.log('Sự kiện loadeddata, thử tua video');
+                    video.play().catch(e => console.error('Lỗi phát video:', e));
+                    seekToProgress();
+                });
+                video.addEventListener('canplay', () => {
+                    console.log('Sự kiện canplay, thử tua video');
+                    seekToProgress();
+                });
+                video.addEventListener('canplaythrough', () => {
+                    console.log('Sự kiện canplaythrough, thử tua video');
+                    seekToProgress();
+                });
+                video.addEventListener('loadedmetadata', () => {
+                    console.log('Sự kiện loadedmetadata, thử tua video');
+                    seekToProgress();
+                });
+            } else {
+                console.error('Trình duyệt không hỗ trợ HLS hoặc định dạng video không phù hợp');
+                return;
+            }
+
+            document.getElementById("main-video-title").textContent = title;
+
+            const categoryList = document.getElementById("category-list");
+            categoryList.innerHTML = '';
+            const categories = Array.isArray(videoData.boloc) ? videoData.boloc : [];
+            if (videoData.ThuyetMinh && videoData.ThuyetMinh.length > 0) categories.push("Thuyết Minh");
+            if (videoData.LongTieng && videoData.LongTieng.length > 0) categories.push("Lồng Tiếng");
+
+            categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.textContent = category;
+                btn.addEventListener('click', () => {
+                    window.location.href = `filter.html?filter=${encodeURIComponent(category)}`;
+                });
+                categoryList.appendChild(btn);
+            });
+
+            const episodeList = document.getElementById("episode-list");
+            episodeList.classList.toggle('hidden', !videoData.tap || videoData.tap.length <= 1);
+            episodeList.innerHTML = '';
+            if (videoData.tap && videoData.tap.length > 1) {
+                const episodeCount = document.createElement('div');
+                episodeCount.className = 'text-sm text-gray-400 mb-2';
+                episodeCount.textContent = `${videoData.tap.length} Tập`;
+                episodeList.appendChild(episodeCount);
+                
+                videoData.tap.forEach((ep, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `episode-btn ${idx === episodeIndex ? 'active' : ''}`;
+                    btn.textContent = ep.tapSo ? `Tập ${ep.tapSo}` : `Phần ${idx + 1}`;
+                    btn.addEventListener('click', () => {
+                        playVideo(videoData, title, seriesId, idx);
+                    });
+                    episodeList.appendChild(btn);
+                });
+            }
+
+            setupVideoControls(video, videoData, title, seriesId);
+            setupProgressTracking(video, videoId);
+        }
+
+        function getAverageColor(video) {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth / 10;
+            canvas.height = video.videoHeight / 10;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let r = 0, g = 0, b = 0;
+            const totalPixels = imageData.length / 4;
+            for (let i = 0; i < imageData.length; i += 4) {
+                r += imageData[i];
+                g += imageData[i + 1];
+                b += imageData[i + 2];
+            }
+            r = Math.floor(r / totalPixels);
+            g = Math.floor(g / totalPixels);
+            b = Math.floor(b / totalPixels);
+            return { r, g, b };
+        }
+
+        function setupVideoControls(videoElement, videoData, title, seriesId) {
+            const videoOverlay = document.querySelector('.video-overlay');
+            const skipBtn = document.getElementById('skip-intro-btn');
+            const nextEpisodeBtn = document.getElementById('next-episode-btn');
+            const ambientBtn = document.getElementById('ambient-btn');
+            const subtitleToggle = document.getElementById('subtitle-toggle');
+            const videoContainer = document.querySelector('.video-container');
+            let isAmbient = false;
+            let countdownInterval;
+
+            function isInIntro() {
+                if (currentVideoData && currentVideoData.introStart && currentVideoData.introEnd) {
+                    const currentTime = videoElement.currentTime;
+                    const introStartSec = parseTimeToSeconds(currentVideoData.introStart);
+                    const introEndSec = parseTimeToSeconds(currentVideoData.introEnd);
+                    return currentTime >= introStartSec && currentTime <= introEndSec;
+                }
+                return false;
+            }
+
+            function showControls() {
+                videoOverlay.classList.add('active');
+            }
+
+            function hideControls() {
+                if (!isInIntro() && !isNearEnd()) {
+                    videoOverlay.classList.remove('active');
+                }
+            }
+
+            function isNearEnd() {
+                if (currentVideoData && videoElement.duration) {
+                    const remainingTime = videoElement.duration - videoElement.currentTime;
+                    return remainingTime <= 8 && currentVideoData.episodes && currentVideoData.episodeIndex < currentVideoData.episodes.length - 1;
+                }
+                return false;
+            }
+
+            videoOverlay.addEventListener('mousemove', showControls);
+            videoOverlay.addEventListener('touchstart', (e) => {
+                showControls();
+            });
+            videoOverlay.addEventListener('mouseleave', hideControls);
+
+            videoElement.addEventListener('timeupdate', () => {
+                if (currentVideoData) {
+                    const currentTime = videoElement.currentTime;
+                    if (currentVideoData.introStart && currentVideoData.introEnd) {
+                        const introStartSec = parseTimeToSeconds(currentVideoData.introStart);
+                        const introEndSec = parseTimeToSeconds(currentVideoData.introEnd);
+                        skipBtn.classList.toggle('hidden', currentTime > introEndSec || currentTime < introStartSec);
+                        if (currentTime >= introStartSec && currentTime <= introEndSec) {
+                            videoOverlay.classList.add('active');
+                        }
+                    } else {
+                        skipBtn.classList.add('hidden');
+                    }
+
+                    if (isNearEnd()) {
+                        nextEpisodeBtn.classList.remove('hidden');
+                        videoOverlay.classList.add('active');
+                        const remainingTime = Math.ceil(videoElement.duration - videoElement.currentTime);
+                        document.getElementById('countdown').textContent = `(${remainingTime}s)`;
+                        if (!countdownInterval) {
+                            countdownInterval = setInterval(() => {
+                                const remaining = Math.ceil(videoElement.duration - videoElement.currentTime);
+                                if (remaining <= 0) {
+                                    clearInterval(countdownInterval);
+                                    countdownInterval = null;
+                                    if (currentVideoData.episodeIndex < currentVideoData.episodes.length - 1) {
+                                        playVideo(videoData, title, seriesId, currentVideoData.episodeIndex + 1);
+                                    }
+                                } else {
+                                    document.getElementById('countdown').textContent = `(${remaining}s)`;
+                                }
+                            }, 1000);
+                        }
+                    } else {
+                        nextEpisodeBtn.classList.add('hidden');
+                        if (countdownInterval) {
+                            clearInterval(countdownInterval);
+                            countdownInterval = null;
+                        }
+                    }
+                }
+            });
+
+            skipBtn.addEventListener('click', () => {
+                if (currentVideoData && currentVideoData.introEnd) {
+                    const introEndSec = parseTimeToSeconds(currentVideoData.introEnd);
+                    videoElement.currentTime = introEndSec;
+                    skipBtn.classList.add('hidden');
+                }
+            });
+
+            nextEpisodeBtn.addEventListener('click', () => {
+                if (currentVideoData && currentVideoData.episodeIndex < currentVideoData.episodes.length - 1) {
+                    playVideo(videoData, title, seriesId, currentVideoData.episodeIndex + 1);
+                }
+            });
+
+            ambientBtn.addEventListener('click', () => {
+                if (currentVideoData.format !== '.m3u8') {
+                    console.log('Chế độ điện ảnh chỉ hỗ trợ file .m3u8');
+                    return;
+                }
+                isAmbient = !isAmbient;
+                if (isAmbient) {
+                    videoContainer.classList.add('ambient');
+                    ambientBtn.textContent = 'Thoát chế độ điện ảnh';
+                    colorUpdateInterval = setInterval(() => {
+                        if (videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
+                            const color = getAverageColor(videoElement);
+                            const rgba30 = `rgba(${color.r}, ${color.g}, ${color.b}, 0.5)`;
+                            const rgba60 = `rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`;
+                            videoContainer.style.boxShadow = `0 0 50px ${rgba30}, 0 0 100px ${rgba60}`;
+                        }
+                    }, 800);
+                } else {
+                    videoContainer.classList.remove('ambient');
+                    ambientBtn.textContent = 'Chế độ điện ảnh';
+                    clearInterval(colorUpdateInterval);
+                    colorUpdateInterval = null;
+                    videoContainer.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.05)';
+                }
+            });
+
+            subtitleToggle.addEventListener('click', () => {
+                const track = videoElement.textTracks[0];
+                if (track) {
+                    if (track.mode === 'showing') {
+                        track.mode = 'hidden';
+                        subtitleToggle.textContent = 'Bật phụ đề';
+                        subtitleToggle.classList.remove('active');
+                    } else {
+                        track.mode = 'showing';
+                        subtitleToggle.textContent = 'Tắt phụ đề';
+                        subtitleToggle.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        // Functions for bottom navigation buttons
+        function showFavorites() {
+            alert('Chức năng Yêu Thích - Sẽ được implement sau');
+        }
+
+        function showWatchlist() {
+            const currentWatching = getCurrentWatchingVideo();
+            if (currentWatching && currentWatching.videoId && currentWatching.title) {
+                window.location.href = `watch.html?id=${encodeURIComponent(currentWatching.videoId)}&title=${encodeURIComponent(currentWatching.title)}`;
+            } else {
+             
+                window.location.href = 'TrangChu.html';
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".filter-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    window.location.href = `filter.html?filter=${encodeURIComponent(btn.dataset.filter)}`;
+                });
+            });
+
+            document.getElementById("search-input").addEventListener("input", (e) => {
+                window.location.href = `filter.html?search=${encodeURIComponent(e.target.value)}`;
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let videoId = urlParams.get('id');
+            let title = urlParams.get('title');
+
+            if (!videoId || !title) {
+                const currentWatching = getCurrentWatchingVideo();
+                if (currentWatching && currentWatching.videoId && currentWatching.title) {
+                    videoId = currentWatching.videoId;
+                    title = currentWatching.title;
+                } else {
+                  
+                    window.location.href = 'TrangChu.html';
+                    return;
+                }
+            }
+
+            fetch("phim.json")
+                .then(response => response.json())
+                .then(data => {
+                    videos = data.filter(v => v.tap && v.tap[0]?.video && v.Dang === '.m3u8');
+                    const videoData = videos.find(v => v.tap.some(ep => cleanVideoUrl(ep.video) === cleanVideoUrl(videoId)));
+                    if (videoData) {
+                        const episodeIndex = videoData.tap.findIndex(ep => cleanVideoUrl(ep.video) === cleanVideoUrl(videoId));
+                        playVideo(videoData, decodeURIComponent(title), videoData.id || videoId, episodeIndex);
+                    } else {
+                        console.error('Không tìm thấy video phù hợp trong phim.json');
+                        alert('Không tìm thấy video. Vui lòng chọn một video khác!');
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi tải danh sách video:", error);
+                    alert('Lỗi tải danh sách video. Vui lòng thử lại sau!');
+                    window.location.href = 'index.html';
+                });
+        });
+    </script>
+</body>
+</html>
