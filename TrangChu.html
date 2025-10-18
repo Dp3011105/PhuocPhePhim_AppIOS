@@ -36,67 +36,7 @@
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
-        /* Welcome Screen */
-        .welcome-screen {
-            position: fixed;
-            inset: 0;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: opacity 0.5s ease;
-        }
-
-        .welcome-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .welcome-logo {
-            font-size: 4rem;
-            font-weight: 900;
-            color: #e5e5e5;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-            margin-bottom: 2rem;
-        }
-
-        .welcome-logo.loading {
-            animation: textGlow 2s ease-in-out forwards;
-        }
-
-        .welcome-btn {
-            background: #ffffff;
-            color: #0a0a0a;
-            padding: 0.75rem 2rem;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            font-size: 1.25rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
-        }
-
-        .welcome-btn:hover {
-            background: #e5e5e5;
-            transform: scale(1.05);
-        }
-
-        .welcome-message {
-            max-width: 600px;
-            margin: 1.5rem auto;
-            text-align: center;
-            color: #ffffff;
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-
         .main-content {
-            display: none;
-        }
-
-        .main-content.active {
             display: block;
         }
 
@@ -350,93 +290,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
             min-height: 20px;
-        }
-
-        .book-slider {
-            display: flex;
-            overflow-x: auto;
-            gap: 1.5rem;
-            padding-bottom: 1rem;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: #555 #222;
-            scroll-behavior: smooth;
-        }
-
-        .book-slider::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .book-slider::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 4px;
-        }
-
-        .book .video-card {
-            position: relative;
-            transition: transform 0.3s ease;
-            width: 360px;
-            height: 200px;
-            display: flex;
-            flex-direction: row;
-            background: linear-gradient(to right, #1a1a1a 50%, rgba(26, 26, 26, 0.9) 75%, transparent 100%);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        .book .video-card img {
-            width: 50%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 0 8px 8px 0;
-            z-index: 1;
-        }
-
-        .book .video-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6);
-        }
-
-        .book .video-card:hover img {
-            transform: scale(1.1);
-        }
-
-        .book .video-card .content {
-            width: 50%;
-            padding: 1.5rem 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            background: transparent;
-            z-index: 2;
-        }
-
-        .book .video-card .content h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #fff;
-            line-clamp: 2;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-height: 48px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        .book .video-card .content p {
-            font-size: 0.75rem;
-            color: #e5e5e5;
-            margin-top: 0.5rem;
-            line-clamp: 3;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
         }
 
         .video-feature-section {
@@ -820,41 +673,12 @@
             100% { transform: translateX(-50%); }
         }
 
-        @keyframes textGlow {
-            0% {
-                text-shadow: 0 0 0 rgba(255, 255, 255, 0);
-                color: #e5e5e5;
-            }
-            50% {
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
-                color: #ffffff;
-            }
-            100% {
-                text-shadow: 0 0 30px rgba(255, 255, 255, 1);
-                color: #ffffff;
-            }
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 640px) {
-            .welcome-logo {
-                font-size: 2.5rem;
-            }
-
-            .welcome-btn {
-                padding: 0.5rem 1.5rem;
-                font-size: 1rem;
-            }
-
-            .welcome-message {
-                font-size: 0.875rem;
-                padding: 0 1rem;
-            }
-
             .featured-section {
                 height: 45vh;
             }
@@ -900,38 +724,6 @@
             .play-btn::before {
                 width: 16px;
                 height: 16px;
-            }
-
-            .book .video-card {
-                width: 280px;
-                height: 180px;
-                flex: 0 0 100%;
-            }
-
-            .book .video-card img {
-                width: 50%;
-                height: 100%;
-            }
-
-            .book .video-card .content {
-                width: 50%;
-                height: 100%;
-                padding: 1rem 0.75rem;
-            }
-
-            .book .video-card .content h3 {
-                font-size: 0.9rem;
-            }
-
-            .book .video-card .content p {
-                font-size: 0.7rem;
-                line-clamp: 2;
-                max-height: 36px;
-            }
-
-            .book-slider {
-                display: flex;
-                justify-content: flex-start;
             }
 
             .category-section {
@@ -987,17 +779,7 @@
             }
         }
 
-        @media (min-width: 641px) {
-            .book .video-card {
-                flex: 0 0 calc(33.333% - 1rem);
-            }
-        }
-
         @media (min-width: 641px) and (max-width: 1024px) {
-            .welcome-logo {
-                font-size: 3.5rem;
-            }
-
             #video-list {
                 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             }
@@ -1011,52 +793,42 @@
             }
         }
 
-        #korean-movies-section .category-grid {
+        /* HOT SECTION STYLES - ÁP DỤNG CHO CẢ KOREAN VÀ ANIME */
+        #korean-movies-section .category-grid,
+        #recommended-movies-section .category-grid {
             gap: 2rem;
         }
 
-        #korean-movies-section .category-grid .video-card {
+        #korean-movies-section .category-grid .video-card,
+        #recommended-movies-section .category-grid .video-card {
             flex: 0 0 300px;
             box-shadow: 0 4px 16px rgba(229, 9, 20, 0.3);
             transition: all 0.4s ease;
         }
 
-        #korean-movies-section .category-grid .video-card:hover {
+        #korean-movies-section .category-grid .video-card:hover,
+        #recommended-movies-section .category-grid .video-card:hover {
             transform: scale(1.1);
             box-shadow: 0 16px 32px rgba(229, 9, 20, 0.5);
         }
 
-        #korean-movies-section .category-grid .video-card img {
+        #korean-movies-section .category-grid .video-card img,
+        #recommended-movies-section .category-grid .video-card img {
             height: 450px;
         }
 
-        #korean-movies-section .category-grid .video-card .content {
+        #korean-movies-section .category-grid .video-card .content,
+        #recommended-movies-section .category-grid .video-card .content {
             height: 100px;
         }
 
-        #korean-movies-section .category-grid .video-card .content h3 {
+        #korean-movies-section .category-grid .video-card .content h3,
+        #recommended-movies-section .category-grid .video-card .content h3 {
             font-size: 1.25rem;
         }
     </style>
 </head>
 <body class="font-sans bg-dark-900 text-gray-200">
-    <div id="welcome-screen" class="welcome-screen">
-        <h1 class="welcome-logo">CoInPhIm</h1>
-        <button id="watch-btn" class="welcome-btn">Xem Phim</button>
-        <div id="welcome-message" class="welcome-message">
-            <p class="mb-2">🎉 Chào mừng đến với PHIM N+!</p>
-            <p class="mb-2">
-                Trang web này mình tự làm để bổ sung vào CV nên có thể còn vài lỗi nhỏ, mong các bạn thông cảm. Do sử dụng service yếu nên web chỉ dùng nội bộ với người quen ĐỪNG SHARE LINH TINH NHÓ.
-            </p>
-            <p class="mb-2">
-                ⚠️ Nếu bạn là cán bộ Công An hoặc An Ninh Mạng THUỘC CƠ QUAN NHÀ NƯỚC: đây không phải là web phim lậu. Nguồn video được nhúng từ các trang khác. Nếu cần danh sách link để kiểm soát/chặn, mình sẵn sàng cung cấp.
-            </p>
-            <p class="mb-2">
-                Trang không chứa quảng cáo và hoàn toàn phi lợi nhuận, chỉ dành cho bạn bè và người thân sử dụng.
-            </p>
-        </div>
-    </div>
-
     <div class="container mx-auto px-4 py-4 main-content">
         <header class="mb-4 flex justify-between items-center">
             <a href="index.html" class="text-3xl font-bold text-white">CoInPhIm</a>
@@ -1141,21 +913,21 @@
                 <div class="video-overlay">
                     <h2 id="recommended-video-title">Superman - Phim Đỉnh Lắm Luôn Bấm Xem Ngay Đi</h2>
                     <a href="https://vip.opstream90.com/20250816/10586_8b77b4b5/3000k/hls/mixed.m3u8" 
-                       class="watch-btn" data-title="La Tiểu Hắc Chiến Ký">Xem ngay</a>
+                       class="watch-btn" data-title="Superman">Xem ngay</a>
                 </div>
             </div>
         </div>
 
         <div id="recommended-movies-section" class="category-section">
-            <h2 class="text-xl font-bold text-white mb-4">Anime tui mò được</h2>
+            <h2 class="text-xl font-bold text-white mb-4">Anime tui mò được đang liên tục cập nhật!</h2>
             <div class="relative">
-                <button class="slider-nav prev" onclick="scrollSlider('recommended-movies-grid', -360)">
+                <button class="slider-nav prev" onclick="scrollSlider('recommended-movies-grid', -300)">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
                 </button>
-                <div id="recommended-movies-grid" class="book-slider book"></div>
-                <button class="slider-nav next" onclick="scrollSlider('recommended-movies-grid', 360)">
+                <div id="recommended-movies-grid" class="category-grid"></div>
+                <button class="slider-nav next" onclick="scrollSlider('recommended-movies-grid', 300)">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -1229,23 +1001,6 @@
         let customFeaturedMovies = [];
         const videosPerPage = 20;
         let currentPage = 1;
-
-        function setCookie(name, value, hours) {
-            const date = new Date();
-            date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
-            const expires = "expires=" + date.toUTCString();
-            document.cookie = name + "=" + value + ";" + expires + ";path=/";
-        }
-
-        function getCookie(name) {
-            const nameEQ = name + "=";
-            const ca = document.cookie.split(';');
-            for(let i=0; i < ca.length; i++) {
-                let c = ca[i].trim();
-                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-            }
-            return null;
-        }
 
         function getVideoTitle(video) {
             return video.TieuDe && video.TieuDe.trim() !== '' 
@@ -1652,8 +1407,7 @@
 
                     grid.innerHTML = '';
                     movies.forEach((movie, index) => {
-                        const isBookSlider = gridId === 'recommended-movies-grid';
-                        const videoCard = createVideoCard(movie, index, isBookSlider);
+                        const videoCard = createVideoCard(movie, index, false);
                         grid.appendChild(videoCard);
                     });
                 })
@@ -1743,32 +1497,6 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Handle welcome screen
-            const welcomeScreen = document.getElementById("welcome-screen");
-            const watchBtn = document.getElementById("watch-btn");
-            const welcomeMessage = document.getElementById("welcome-message");
-            const welcomeLogo = document.querySelector(".welcome-logo");
-            const mainContent = document.querySelector(".main-content");
-
-            const viewedWelcome = getCookie("viewedWelcome");
-
-            if (viewedWelcome === "true") {
-                welcomeScreen.classList.add("hidden");
-                mainContent.classList.add("active");
-            } else {
-                watchBtn.addEventListener("click", () => {
-                    welcomeLogo.classList.add("loading");
-                    watchBtn.classList.add("hidden");
-                    welcomeMessage.classList.add("hidden");
-                    setCookie("viewedWelcome", "true", 3); // Set cookie to expire in 3 hours
-                    setTimeout(() => {
-                        welcomeScreen.classList.add("hidden");
-                        mainContent.classList.add("active");
-                    }, 2000);
-                });
-            }
-
-            // Load content
             document.body.addEventListener('click', (e) => {
                 const target = e.target.closest('a[href$=".m3u8"]');
                 if (target) {
@@ -1801,7 +1529,7 @@
             });
 
             document.addEventListener("keydown", (e) => {
-                const grids = document.querySelectorAll(".category-grid, .book-slider");
+                const grids = document.querySelectorAll(".category-grid");
                 grids.forEach(grid => {
                     if (e.key === "ArrowLeft") {
                         scrollSlider(grid.id, -360);
